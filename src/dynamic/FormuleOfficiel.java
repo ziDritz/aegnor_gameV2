@@ -11,6 +11,22 @@ import java.util.ArrayList;
 
 public class FormuleOfficiel {
 
+
+    // Constants for XP calculation
+    private static final double BASE_SAGE_MULTIPLIER = 0.5;
+    private static final double MIN_RAPPORT = 0.01;
+    private static final double MAX_RAPPORT = 1.0;
+    private static final double RAPPORT_SINGLE_WINNER = 0.6;
+    private static final double RAPPORT_BALANCED = 1.0;
+    private static final double RAPPORT_UPPER_BOUND = 1.1;
+    private static final double RAPPORT_LOWER_BOUND = 0.9;
+    private static final int MAX_GROUP_SIZE = 8;
+    private static final int MAX_BONUS_LEVEL = 8;
+    private static final double MIN_NV_GRP_MONSTER = 3.0;
+    private static final double VIP_BONUS = 1.15;
+    private static final double MIN_SAGE_VALUE = 100.0;
+
+
     public static long getXp(Object object, ArrayList<Fighter> winners,
                              long groupXp, byte nbonus, int star, int challenge, int lvlMax,
                              int lvlMin, int lvlLoosers, int lvlWinners) {
@@ -190,9 +206,9 @@ public class FormuleOfficiel {
         return 0;
     }
 
-    public static long getXp2(Object object, ArrayList<Fighter> winners,
-                             long groupXp, double nbonus, int star, int challenge, int lvlMax,
-                             int lvlMin, int lvlLoosers, int lvlWinners,double bonusip, double bonusclasse,boolean offiLike) {
+    public static long getXp2Old(Object object, ArrayList<Fighter> winners,
+                                 long groupXp, double nbonus, int star, int challenge, int lvlMax,
+                                 int lvlMin, int lvlLoosers, int lvlWinners,double bonusip, double bonusclasse,boolean offiLike) {
 
         if (lvlMin <= 0 || object == null)
             return 0;
@@ -279,5 +295,26 @@ public class FormuleOfficiel {
             }
         }
         return 0;
+    }
+
+
+
+    public static long getXp2(Object object, ArrayList<Fighter> winners, long groupXp, int challenge, int lvlMin, int lvlWinners) {
+        if (lvlMin <= 0 || !(object instanceof Fighter fighter)) {
+            return 0;
+        }
+
+        Player player = fighter.getPlayer();
+
+
+        if (!winners.contains(fighter) || lvlWinners <= 0) {
+            return 0;
+        }
+
+        double bonusChallenge = 1.0 + ((double) challenge / 100);
+
+
+        double total = (bonusChallenge * groupXp) * Config.INSTANCE.getRATE_XP() * World.world.getConquestBonusNew(fighter.getPlayer());
+        return (long) total;
     }
 }

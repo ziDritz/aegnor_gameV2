@@ -5566,7 +5566,7 @@ public class Fight {
                     if (player != null) {
                         //xpPlayer = FormuleOfficiel.getXp(i, winners, totalXP, nbbonus, (getMobGroup() != null ? getMobGroup().getStarBonus() : 0), challXp, lvlMax, lvlMin, lvlLoosers, lvlWinners);
 
-                        xpPlayer2 = FormuleOfficiel.getXp2(i, winners, totalXP,BonuslvlMoyen , (getMobGroup() != null ? getMobGroup().getStarBonus() : 0), challXp, lvlMax, lvlMin, lvlLoosers, lvlWinners,BonusPerdiffip,BonusPerdiffclasse,player.isXpOffilike);
+                        xpPlayer2 = FormuleOfficiel.getXp2(i, winners, totalXP, challXp, lvlMin, lvlWinners);
                         //player.sendMessage("Avec l'ancienne méthode de calcul tu aurais gagné " + xpPlayer+ " XP");
 
                         XP.set(xpPlayer2);
