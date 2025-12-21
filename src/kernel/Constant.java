@@ -1010,7 +1010,7 @@ public class Constant {
 
 
     public static void onLevelUpSpells(Player perso, int lvl) {
-        switch (perso.getClasse()) {
+        switch (perso.getClasseID()) {
             case CLASS_FECA:
                 if (lvl == 3)
                     perso.learnSpell(4, 1, true, false, false);//Renvoie de sort

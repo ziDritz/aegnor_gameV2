@@ -1385,7 +1385,7 @@ public class Fight {
             for (Fighter f : getTeam0().values()) {
                 Player player = f.getPlayer();
                 if (f.getPlayer() != null) {
-                    switch (player.getClasse()) {
+                    switch (player.getClasseID()) {
                         case Constant.CLASS_OSAMODAS:
                         case Constant.CLASS_FECA:
                         case Constant.CLASS_SADIDA:
@@ -2445,7 +2445,7 @@ public class Fight {
                 for(Fighter fighter : tablefighter.values()){
                     Player player = fighter.getPlayer();
                     if(player != null){
-                        if(player.getClasse() == perso.getClasse()){
+                        if(player.getClasseID() == perso.getClasseID()){
                              testclass++;
                         }
                     }
@@ -5501,8 +5501,8 @@ public class Fight {
                 Player player = i.getPlayer();
                 if(player != null) {
                     k++;
-                    if (!(playersclass.contains(player.getClasse()))) {
-                        playersclass.add(player.getClasse());
+                    if (!(playersclass.contains(player.getClasseID()))) {
+                        playersclass.add(player.getClasseID());
                     }
                     if (!(playersip.contains(player.getAccount().getCurrentIp()))) {
                         playersip.add(player.getAccount().getCurrentIp());

@@ -426,11 +426,11 @@ public class NpcQuestion {
 
                             case 6699: // Apprendre le sort de sa classe
                                 GameMap curMap = player.getCurMap();
-                                int idMap = World.world.getTempleByClasse(player.getClasse());
+                                int idMap = World.world.getTempleByClasse(player.getClasseID());
                                 if (curMap.getId() == (short) idMap) // Si on est dans le temple de notre classe
                                 {
                                     // si on a le doplon de classe
-                                    ok = player.hasItemTemplate(Dopeul.getDoplonByClasse(player.getClasse()), 1) && !player.hasSpell(Constant.getSpecialSpellByClasse(player.getClasse()));
+                                    ok = player.hasItemTemplate(Dopeul.getDoplonByClasse(player.getClasseID()), 1) && !player.hasSpell(Constant.getSpecialSpellByClasse(player.getClasseID()));
                                 } else
                                     ok = false;
                                 break; // Faire sur l'action id
@@ -439,10 +439,10 @@ public class NpcQuestion {
                                 break;
                             case 7326: // Reset caract�ristique
                                 GameMap curMap2 = player.getCurMap();
-                                int idMap2 = World.world.getTempleByClasse(player.getClasse());
+                                int idMap2 = World.world.getTempleByClasse(player.getClasseID());
                                 if (curMap2.getId() == (short) idMap2) // Si on est dans le temple de notre classe
                                 {
-                                    if (!player.hasItemTemplate(Dopeul.getDoplonByClasse(player.getClasse()), 1))
+                                    if (!player.hasItemTemplate(Dopeul.getDoplonByClasse(player.getClasseID()), 1))
                                         ok = false; // si on a le doplon de classe
                                     if (player.hasItemTemplate(10601, 1))
                                         ok = false; // Si on a le certificat de restat

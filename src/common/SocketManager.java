@@ -211,7 +211,7 @@ public class SocketManager {
                 }
             }
             packet.append("ASK|").append(perso.getId()).append("|").append(perso.getName()).append("|");
-            packet.append(perso.getLevel()).append("|").append(perso.getMorphMode() ? -1 : perso.getClasse()).append("|").append(perso.getSexe());
+            packet.append(perso.getLevel()).append("|").append(perso.getMorphMode() ? -1 : perso.getClasseID()).append("|").append(perso.getSexe());
             packet.append("|").append(perso.getGfxId()).append("|").append((color1 == -1 ? "-1" : Integer.toHexString(color1)));
             packet.append("|").append((color2 == -1 ? "-1" : Integer.toHexString(color2))).append("|");
             packet.append((color3 == -1 ? "-1" : Integer.toHexString(color3))).append("|");
@@ -2949,7 +2949,7 @@ public class SocketManager {
 
     public static void ENVIAR_AB_PERSONAJE_A_LIDER(Player player, Player leader) {
         String packet = "AB" + player.getId() + "|" + player.getName() + "|" + player.getLevel() + "|"
-                + player.getClasse() + "|" + player.getSexe() + "|" + player.getGfxId() + "|";
+                + player.getClasseID() + "|" + player.getSexe() + "|" + player.getGfxId() + "|";
         if (player.getColor1() == -1) {
             packet += "-1|";
         }
@@ -2974,7 +2974,7 @@ public class SocketManager {
 
     public static void SEND_AB_LEADER_OPTI(Player player, Player leader) {
         String packet = "AB" + player.getId() + "|" + player.getName() + "|" + player.getLevel() + "|"
-                + player.getClasse() + "|" + player.getSexe() + "|" + player.getGfxId() + "|";
+                + player.getClasseID() + "|" + player.getSexe() + "|" + player.getGfxId() + "|";
         if (player.getColor1() == -1) {
             packet += "-1|";
         }

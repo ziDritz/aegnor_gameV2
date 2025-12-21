@@ -106,8 +106,8 @@ public class Player {
     private int id;
     private String name;
     private int sexe;
-    private int classe;
-    private Classe classeinit;
+    private int classeID;
+    private Classe classe;
     private int color1;
     private int color2;
     private int color3;
@@ -294,7 +294,7 @@ public class Player {
         return craftingType;
     }
 
-    public Player(int id, String name, int groupe, int sexe, int classe,
+    public Player(int id, String name, int groupe, int sexe, int classeID,
                   int color1, int color2, int color3, long kamas, int pts,
                   int _capital, int energy, int level, long exp, int _size,
                   int _gfxid, byte alignement, int account,
@@ -310,8 +310,8 @@ public class Player {
         this.name = name;
         this.groupe = Group.getGroupeById(groupe);
         this.sexe = sexe;
-        this.classe = classe;
-        this.classeinit = World.world.getClasse(classe);
+        this.classeID = classeID;
+        this.classe = World.world.getClasse(classeID);
         this.color1 = color1;
         this.color2 = color2;
         this.color3 = color3;
@@ -538,7 +538,7 @@ public class Player {
     }
 
     //Clone double
-    public Player(int id, String name, int groupe, int sexe, int classe,
+    public Player(int id, String name, int groupe, int sexe, int classeID,
                   int color1, int color2, int color3, int level, int _size,
                   int _gfxid, Map<Integer, Integer> stats, String stuff,
                   int pdvPer, byte seeAlign, int mount, int alvl, byte alignement) {
@@ -546,7 +546,7 @@ public class Player {
         this.name = name;
         this.groupe = Group.getGroupeById(groupe);
         this.sexe = sexe;
-        this.classe = classe;
+        this.classeID = classeID;
         this.color1 = color1;
         this.color2 = color2;
         this.color3 = color3;
@@ -640,7 +640,7 @@ public class Player {
         int  PDV = mobModelo.getPdv();
         this.id = id;
         name = mobModelo.getTemplate().getName();
-        classe = Constant.CLASS_MULTIMAN;
+        classeID = Constant.CLASS_MULTIMAN;
         level = mobModelo.getLevel();
         gfxId = mobModelo.getTemplate().getGfxId();
         _size = 100;
@@ -755,7 +755,7 @@ public class Player {
 
     public boolean isMultiman()
     {
-        if(classe == Constant.CLASS_MULTIMAN)
+        if(classeID == Constant.CLASS_MULTIMAN)
         {
             return true;
         }
@@ -792,7 +792,7 @@ public class Player {
             mountID = P.getMount().getId();
         }
 
-        Player Clone = new Player(id, P.getName(), (P.getGroupe() != null) ? P.getGroupe().getId() : -1, P.getSexe(), P.getClasse(), P.getColor1(), P.getColor2(), P.getColor3(), P.getLevel(), 100, P.getGfxId(), stats, "", 100, showWings, mountID, alvl, P.get_align());
+        Player Clone = new Player(id, P.getName(), (P.getGroupe() != null) ? P.getGroupe().getId() : -1, P.getSexe(), P.getClasseID(), P.getColor1(), P.getColor2(), P.getColor3(), P.getLevel(), 100, P.getGfxId(), stats, "", 100, showWings, mountID, alvl, P.get_align());
         Clone.objects = new HashMap<>();
         Clone.objects.putAll(P.objects);
         Clone.set_isClone(true);
@@ -843,16 +843,16 @@ public class Player {
 
     public void setSexe(int sexe) {
         this.sexe = sexe;
-        this.setGfxId(10 * this.getClasse() + this.sexe);
+        this.setGfxId(10 * this.getClasseID() + this.sexe);
     }
 
-    public int getClasse() {
-        return this.classe;
+    public int getClasseID() {
+        return this.classeID;
     }
 
-    public void setClasse(int classe) {
-        this.classe = classe;
-        this.classeinit = World.world.getClasse(classe);
+    public void setClasseID(int classeID) {
+        this.classeID = classeID;
+        this.classe = World.world.getClasse(classeID);
 
     }
 
@@ -1135,7 +1135,7 @@ public class Player {
         if (obj != null) {
             obj.getStats().addOneStat(Constant.STATS_TURN, -1);
             if (obj.getStats().getEffect(Constant.STATS_TURN) <= 0) {
-                gfxId = getClasse() * 10 + getSexe();
+                gfxId = getClasseID() * 10 + getSexe();
                 if (this.getFight() == null)
                     SocketManager.GAME_SEND_ALTER_GM_PACKET(getCurMap(), this);
                 SocketManager.GAME_SEND_REMOVE_ITEM_PACKET(this, obj.getGuid());
@@ -1156,7 +1156,7 @@ public class Player {
         if (obj != null) {
             obj.getStats().addOneStat(Constant.STATS_TURN, -1);
             if (obj.getStats().getEffect(Constant.STATS_TURN) <= 0) {
-                gfxId = getClasse() * 10 + getSexe();
+                gfxId = getClasseID() * 10 + getSexe();
                 SocketManager.GAME_SEND_ALTER_GM_PACKET(getCurMap(), this);
                 SocketManager.GAME_SEND_REMOVE_ITEM_PACKET(this, obj.getGuid());
                 this.deleteItem(obj.getGuid());
@@ -1235,7 +1235,7 @@ public class Player {
         _sorts.clear();
         _sortsPlaces.clear();
         _sorts = spells;
-        _sortsPlaces = Constant.getStartSortsPlaces(this.getClasse());
+        _sortsPlaces = Constant.getStartSortsPlaces(this.getClasseID());
     }
 
     public void teleportOldMap() {
@@ -1531,7 +1531,7 @@ public class Player {
     }
 
     public void setGfxId(int _gfxid) {
-        if (this.getClasse() * 10 + this.getSexe() != _gfxid) {
+        if (this.getClasseID() * 10 + this.getSexe() != _gfxid) {
             if (this.isOnMount())
                 this.toogleOnMount();
             this.send("AR3K");
@@ -1581,7 +1581,7 @@ public class Player {
 
     public void setSpellsPlace(boolean ok) {
         if (ok)
-            _sortsPlaces = Constant.getStartSortsPlaces(this.getClasse());
+            _sortsPlaces = Constant.getStartSortsPlaces(this.getClasseID());
         else
             _sortsPlaces.clear();
         SocketManager.GAME_SEND_SPELL_LIST(this);
@@ -1738,14 +1738,14 @@ public class Player {
 
     public void demorph() {
         if (this.getMorphMode()) {
-            int morphID = this.getClasse() * 10 + this.getSexe();
+            int morphID = this.getClasseID() * 10 + this.getSexe();
             this.setGfxId(morphID);
             SocketManager.GAME_SEND_ERASE_ON_MAP_TO_MAP(this.getCurMap(), this.getId());
             SocketManager.GAME_SEND_ADD_PLAYER_TO_MAP(this.getCurMap(), this);
         }
-        else if(_morphId != this.getClasse() * 10 + this.getSexe())
+        else if(_morphId != this.getClasseID() * 10 + this.getSexe())
         {
-            this.setGfxId(this.getClasse() * 10 + this.getSexe());
+            this.setGfxId(this.getClasseID() * 10 + this.getSexe());
             SocketManager.GAME_SEND_ERASE_ON_MAP_TO_MAP(this.getCurMap(), this.getId());
             SocketManager.GAME_SEND_ADD_PLAYER_TO_MAP(this.getCurMap(), this);
         }
@@ -1870,7 +1870,7 @@ public class Player {
     }
 
     public boolean isMorph() {
-        return (this.gfxId != (this.getClasse() * 10 + this.getSexe()));
+        return (this.gfxId != (this.getClasseID() * 10 + this.getSexe()));
     }
 
     public boolean canCac() {
@@ -1878,7 +1878,7 @@ public class Player {
     }
 
     public void unsetMorph() {
-        this.setGfxId(this.getClasse() * 10 + this.getSexe());
+        this.setGfxId(this.getClasseID() * 10 + this.getSexe());
         SocketManager.GAME_SEND_ALTER_GM_PACKET(this.curMap, this);
         Database.getStatics().getPlayerData().update(this);
     }
@@ -1887,7 +1887,7 @@ public class Player {
         if (!_morphMode)
             return;
 
-        int morphID = this.getClasse() * 10 + this.getSexe();
+        int morphID = this.getClasseID() * 10 + this.getSexe();
         setGfxId(morphID);
 
         useStats = false;
@@ -1992,7 +1992,7 @@ public class Player {
 
         if (this._mount != null)
             SocketManager.GAME_SEND_Re_PACKET(this, "+", this._mount);
-        if (this.getClasse() * 10 + this.getSexe() != this.getGfxId())
+        if (this.getClasseID() * 10 + this.getSexe() != this.getGfxId())
             this.send("AR3K");
 
         SocketManager.GAME_SEND_Rx_PACKET(this);
@@ -2206,7 +2206,7 @@ public class Player {
         {
             str.append(curCell.getId()).append(";").append(_orientation).append(";");
             str.append("0").append(";");//FIXME:?
-            str.append(this.getId()).append(";").append(this.getName()).append(";").append(this.getClasse());
+            str.append(this.getId()).append(";").append(this.getName()).append(";").append(this.getClasseID());
             str.append((this.get_title() > 0 ? ("," + this.get_title() + ";") : (";")));
             int gfx = gfxId;
             if (this.getObjetByPos(Constant.ITEM_POS_ROLEPLAY_BUFF) != null)
@@ -2602,7 +2602,7 @@ public class Player {
                 int fact = 4;
                 int maxPdv = this.maxPdv - 55;
                 int curPdv = this.curPdv - 55;
-                if (this.getClasse() == Constant.CLASS_SACRIEUR)
+                if (this.getClasseID() == Constant.CLASS_SACRIEUR)
                     fact = 8;
                 double coef = maxPdv / fact;
 
@@ -2758,11 +2758,11 @@ public class Player {
                     value = this.getStats().getEffect(EffectConstant.STATS_ADD_INTE);
                     break;
             }
-            int cout = Constant.getReqPtsToBoostStatsByClass(this.getClasse(), stat, value);
+            int cout = Constant.getReqPtsToBoostStatsByClass(this.getClasseID(), stat, value);
             if (cout <= _capital) {
                 switch (stat) {
                     case 11://Vita
-                        if (this.getClasse() != Constant.CLASS_SACRIEUR)
+                        if (this.getClasseID() != Constant.CLASS_SACRIEUR)
                             this.getStats().addOneStat(EffectConstant.STATS_ADD_VITA, 1);
                         else
                             this.getStats().addOneStat(EffectConstant.STATS_ADD_VITA, 2);
@@ -4535,7 +4535,7 @@ public class Player {
             str.append("?;");
             str.append("-1;");
         }
-        str.append(this.getClasse()).append(";");
+        str.append(this.getClasseID()).append(";");
         str.append(this.getSexe()).append(";");
         str.append(gfxId);
         return str.toString();
@@ -4553,7 +4553,7 @@ public class Player {
             str.append("?;");
             str.append("-1;");
         }
-        str.append(this.getClasse()).append(";");
+        str.append(this.getClasseID()).append(";");
         str.append(this.getSexe()).append(";");
         str.append(gfxId);
         return str.toString();
@@ -4577,7 +4577,7 @@ public class Player {
             SocketManager.GAME_SEND_Im_PACKET(this, "1115");
             return;
         }
-        if (this.getClasse() * 10 + this.getSexe() != this.getGfxId())
+        if (this.getClasseID() * 10 + this.getSexe() != this.getGfxId())
             return;
         if (this.getInHouse() != null) {
             SocketManager.GAME_SEND_Im_PACKET(this, "1117");
@@ -5612,12 +5612,12 @@ public class Player {
             this.getStats().addOneStat(126, -this.getStats().getEffect(126));
             this.addCapital((this.getLevel() - 1) * 5 - this.get_capital());
             this.getStatsParcho().getEffects().clear();
-            this._sorts = Constant.getStartSorts(classe);
-            this._sortsPlaces = Constant.getStartSortsPlaces(classe);
+            this._sorts = Constant.getStartSorts(classeID);
+            this._sortsPlaces = Constant.getStartSortsPlaces(classeID);
             this.level = 1;
             this.exp = 0;
-            this.curMap = World.world.getMap(Constant.getStartMap(this.classe));
-            this.curCell = this.curMap.getCase(Constant.getStartCell(this.classe));
+            this.curMap = World.world.getMap(Constant.getStartMap(this.classeID));
+            this.curCell = this.curMap.getCase(Constant.getStartCell(this.classeID));
         }
         this._honor = 0;
         this._deshonor = 0;
@@ -5635,7 +5635,7 @@ public class Player {
         this.isGhost = false;
         this.dead = 0;
         this.setEnergy(10000);
-        this.setGfxId(Integer.parseInt(this.getClasse() + "" + this.getSexe()));
+        this.setGfxId(Integer.parseInt(this.getClasseID() + "" + this.getSexe()));
         this.setCanAggro(true);
         this.setAway(false);
         this.setSpeed(0);
@@ -5658,7 +5658,7 @@ public class Player {
             this.set_orientation(1);
             SocketManager.GAME_SEND_eD_PACKET_TO_MAP(this.getCurMap(), this.getId(), 1);
         }
-        this.setGfxId(Integer.parseInt(this.getClasse() + "3"));
+        this.setGfxId(Integer.parseInt(this.getClasseID() + "3"));
         SocketManager.send(this, "AR3K");//Block l'orientation
         SocketManager.send(this, "M112");//T'es mort!!! t'es mort!!! Mouhhahahahahaaaarg
         SocketManager.GAME_SEND_ALTER_GM_PACKET(getCurMap(), this);
@@ -5668,7 +5668,7 @@ public class Player {
         if (isOnMount())
             toogleOnMount();
         if(Config.INSTANCE.getHEROIC()) {
-            this.setGfxId(Integer.parseInt(this.getClasse() + "" + this.getSexe()));
+            this.setGfxId(Integer.parseInt(this.getClasseID() + "" + this.getSexe()));
             this.send("GO");
             return;
         }
@@ -5692,7 +5692,7 @@ public class Player {
         this.dead = 0;
         this.setEnergy(1000);
         this.setPdv(1);
-        this.setGfxId(Integer.parseInt(this.getClasse() + "" + this.getSexe()));
+        this.setGfxId(Integer.parseInt(this.getClasseID() + "" + this.getSexe()));
         this.setCanAggro(true);
         this.setAway(false);
         this.setSpeed(0);
@@ -6823,13 +6823,13 @@ public class Player {
                 value = this.getStats().getEffect(EffectConstant.STATS_ADD_INTE);
                 break;
         }
-        int cout = Constant.getReqPtsToBoostStatsByClass(this.getClasse(), stat, value);
+        int cout = Constant.getReqPtsToBoostStatsByClass(this.getClasseID(), stat, value);
         if (!capital)
             cout = 0;
         if (cout <= _capital) {
             switch (stat) {
                 case 11://Vita
-                    if (this.getClasse() != Constant.CLASS_SACRIEUR)
+                    if (this.getClasseID() != Constant.CLASS_SACRIEUR)
                         this.getStats().addOneStat(EffectConstant.STATS_ADD_VITA, 1);
                     else
                         this.getStats().addOneStat(EffectConstant.STATS_ADD_VITA, capital ? 2 : 1);
@@ -6897,7 +6897,7 @@ public class Player {
         boolean mod = false;
         while (true) {
             valorStat = this.stats.getEffect(statID);
-            boost = classeinit.getBoostStat(statID, valorStat);
+            boost = classe.getBoostStat(statID, valorStat);
             usados += boost.cost;
 
             if (usados <= pointUsed) {
@@ -6956,7 +6956,7 @@ public class Player {
         } else if (clase > 12) {
             clase = 12;
         }
-        if (clase == getClasse()) {
+        if (clase == getClasseID()) {
             this.sendMessage("Vous ne pouvez pas changer de classe pour la même classe");
             //ocketManager.GAME_SEND_BN_OUT(this, "Changement de Classe - Même Classe");
             return false;
@@ -6989,14 +6989,14 @@ public class Player {
             this.set_spellPts(this.get_spellPts() + point);
         }
 
-        this.setClasse(clase);
+        this.setClasseID(clase);
         //Clase = Mundo.getClase(ClaseID);
-        SocketManager.GAME_SEND_AC_CHANGE_CLASSE(this, getClasse());
-        this._sorts = Constant.getStartSorts(classe);
+        SocketManager.GAME_SEND_AC_CHANGE_CLASSE(this, getClasseID());
+        this._sorts = Constant.getStartSorts(classeID);
         for (int a = 1; a <= this.getLevel(); a++) {
             Constant.onLevelUpSpells(this, a);
         }
-        this._sortsPlaces = Constant.getStartSortsPlaces(classe);
+        this._sortsPlaces = Constant.getStartSortsPlaces(classeID);
         /*int spellpoints = 0;
         for(int i = 2; i < 201; i++)
         {

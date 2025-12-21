@@ -91,7 +91,7 @@ public class ConditionParser {
             jep.addVariable("PP", perso.getGrade());//Grade
             jep.addVariable("PL", perso.getLevel());//Niveau
             jep.addVariable("PK", perso.getKamas());//Kamas
-            jep.addVariable("PG", perso.getClasse());//Classe
+            jep.addVariable("PG", perso.getClasseID());//Classe
             jep.addVariable("PS", perso.getSexe());//Sexe
             jep.addVariable("PZ", 1);//Abonnement
             jep.addVariable("PX", (perso.getGroupe() != null));//Niveau GM

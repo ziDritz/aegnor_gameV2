@@ -1322,7 +1322,7 @@ public class Fighter implements Comparable<Fighter> {
 
         switch (this.type) {
             case 1://Perso
-                str.append(this.perso.getClasse()).append(";");
+                str.append(this.perso.getClasseID()).append(";");
                 str.append(this.perso.getGfxId()).append("^").append(this.perso.get_size()).append(";");
                 str.append(this.perso.getSexe()).append(";");
                 str.append(this.perso.getLevel()).append(";");
@@ -1412,7 +1412,7 @@ public class Fighter implements Comparable<Fighter> {
                 str.append(this.team);
                 break;
             case 10://Double
-                str.append(getDouble().getClasse()).append(";");
+                str.append(getDouble().getClasseID()).append(";");
                 str.append(getDouble().getGfxId()).append("^").append(getDouble().get_size()).append(";");
                 str.append(getDouble().getSexe()).append(";");
                 str.append(getDouble().getLevel()).append(";");

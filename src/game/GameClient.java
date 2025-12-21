@@ -5170,7 +5170,7 @@ public class GameClient {
                     int sex = artissant.getSexe();
                     int map = artissant.getCurMap().getId();
                     int inJob = (map == 8731 || map == 8732) ? 1 : 0;
-                    int classe = artissant.getClasse();
+                    int classe = artissant.getClasseID();
                     for (JobStat SM : artissant.getMetiers().values()) {
                         if (SM.getTemplate().getId() != Metier)
                             continue;
@@ -8146,14 +8146,14 @@ public class GameClient {
                         SocketManager.GAME_SEND_ADD_PLAYER_TO_MAP(this.player.getCurMap(), this.player);
                         SocketManager.GAME_SEND_MESSAGE(this.player, "Vous avez été transformé en mercenaire.");
                     } else if (position == Constant.ITEM_POS_NO_EQUIPED) {
-                        this.player.setGfxId(this.player.getClasse() * 10 + this.player.getSexe());
+                        this.player.setGfxId(this.player.getClasseID() * 10 + this.player.getSexe());
                         SocketManager.GAME_SEND_ERASE_ON_MAP_TO_MAP(this.player.getCurMap(), this.player.getId());
                         SocketManager.GAME_SEND_ADD_PLAYER_TO_MAP(this.player.getCurMap(), this.player);
                         SocketManager.GAME_SEND_MESSAGE(this.player, "Vous n'êtes plus mercenaire.");
                     }
                 }
                 if (object.getTemplate().getId() != 2157 && this.player.isMorphMercenaire() && position == Constant.ITEM_POS_COIFFE) {
-                    this.player.setGfxId(this.player.getClasse() * 10 + this.player.getSexe());
+                    this.player.setGfxId(this.player.getClasseID() * 10 + this.player.getSexe());
                     SocketManager.GAME_SEND_ERASE_ON_MAP_TO_MAP(this.player.getCurMap(), this.player.getId());
                     SocketManager.GAME_SEND_ADD_PLAYER_TO_MAP(this.player.getCurMap(), this.player);
                     SocketManager.GAME_SEND_MESSAGE(this.player, "Vous n'êtes plus mercenaire.");

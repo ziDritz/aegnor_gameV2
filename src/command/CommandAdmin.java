@@ -311,7 +311,7 @@ public class CommandAdmin extends AdminUser {
                     continue;
                 i++;
                 mess = player.getName() + " (" + player.getId() + ") ";
-                mess += returnClasse(player.getClasse());
+                mess += returnClasse(player.getClasseID());
                 mess += " ";
                 mess += (player.getSexe() == 0 ? "M" : "F") + " ";
                 mess += player.getLevel() + " ";
@@ -343,7 +343,7 @@ public class CommandAdmin extends AdminUser {
                     continue;
 
                 mess = player.getName() + " (" + player.getId() + ") ";
-                mess += returnClasse(player.getClasse());
+                mess += returnClasse(player.getClasseID());
                 mess += " ";
                 mess += (player.getSexe() == 0 ? "M" : "F") + " ";
                 mess += player.getLevel() + " ";
@@ -372,7 +372,7 @@ public class CommandAdmin extends AdminUser {
                     continue;
 
                 mess = player.getName() + " (" + player.getId() + ") ";
-                mess += returnClasse(player.getClasse());
+                mess += returnClasse(player.getClasseID());
                 mess += " ";
                 mess += (player.getSexe() == 0 ? "M" : "F") + " ";
                 mess += player.getLevel() + " ";
@@ -1320,7 +1320,7 @@ public class CommandAdmin extends AdminUser {
                 }
             }
             if (morphID == -1) {
-                morphID = target.getClasse() * 10 + target.getSexe();
+                morphID = target.getClasseID() * 10 + target.getSexe();
                 target.setGfxId(morphID);
                 SocketManager.GAME_SEND_ERASE_ON_MAP_TO_MAP(target.getCurMap(), target.getId());
                 SocketManager.GAME_SEND_ADD_PLAYER_TO_MAP(target.getCurMap(), target);
@@ -1340,7 +1340,7 @@ public class CommandAdmin extends AdminUser {
         } else if (command.equalsIgnoreCase("DEMORPHALL"))
         {
             for (Player player : World.world.getOnlinePlayers()) {
-                player.setGfxId(player.getClasse() * 10 + player.getSexe());
+                player.setGfxId(player.getClasseID() * 10 + player.getSexe());
             }
             this.sendMessage("Tous les joueurs connectes ont leur apparence originale.");
             return;
@@ -4979,7 +4979,7 @@ public class CommandAdmin extends AdminUser {
                         continue;
                     i++;
                     mess = player.getName() + " (" + player.getId() + ") ";
-                    mess += returnClasse(player.getClasse());
+                    mess += returnClasse(player.getClasseID());
                     mess += " ";
                     mess += (player.getSexe() == 0 ? "M" : "F") + " ";
                     mess += player.getLevel() + " ";
@@ -5012,7 +5012,7 @@ public class CommandAdmin extends AdminUser {
                         continue;
 
                     mess = player.getName() + " (" + player.getId() + ") ";
-                    mess += returnClasse(player.getClasse());
+                    mess += returnClasse(player.getClasseID());
                     mess += " ";
                     mess += (player.getSexe() == 0 ? "M" : "F") + " ";
                     mess += player.getLevel() + " ";
@@ -5879,7 +5879,7 @@ public class CommandAdmin extends AdminUser {
             case 49 : // DEMORPHALL
             {
                 for (Player player : World.world.getOnlinePlayers()) {
-                    player.setGfxId(player.getClasse() * 10 + player.getSexe());
+                    player.setGfxId(player.getClasseID() * 10 + player.getSexe());
                 }
                 this.sendMessage("Tous les joueurs connectes ont leur apparence originale.");
                 break;
@@ -5909,7 +5909,7 @@ public class CommandAdmin extends AdminUser {
                     }
                 }
                 if (morphID == -1) {
-                    morphID = target.getClasse() * 10 + target.getSexe();
+                    morphID = target.getClasseID() * 10 + target.getSexe();
                     target.setGfxId(morphID);
                     SocketManager.GAME_SEND_ERASE_ON_MAP_TO_MAP(target.getCurMap(), target.getId());
                     SocketManager.GAME_SEND_ADD_PLAYER_TO_MAP(target.getCurMap(), target);

@@ -23,7 +23,7 @@ public class Stats {
         if (addBases) {
             this.effects.put(EffectConstant.STATS_ADD_PA, player.getLevel() < 100 ? 6 : 7);
             this.effects.put(EffectConstant.STATS_ADD_PM, player.getLevel() == 200 ? 4 : 3);
-            this.effects.put(EffectConstant.STATS_ADD_PROS, player.getClasse() == Constant.CLASS_ENUTROF ? 120 : 100);
+            this.effects.put(EffectConstant.STATS_ADD_PROS, player.getClasseID() == Constant.CLASS_ENUTROF ? 120 : 100);
             this.effects.put(EffectConstant.STATS_ADD_PODS, 5000);
             this.effects.put(EffectConstant.STATS_CREATURE, 1);
             this.effects.put(EffectConstant.STATS_ADD_INIT, 1);
@@ -37,7 +37,7 @@ public class Stats {
         if (addBases) {
             this.effects.put(EffectConstant.STATS_ADD_PA, player.getLevel() < 100 ? 6 : 7);
             this.effects.put(EffectConstant.STATS_ADD_PM, player.getLevel() == 200 ? 4 : 3);
-            this.effects.put(EffectConstant.STATS_ADD_PROS, player.getClasse() == Constant.CLASS_ENUTROF ? 120 : 100);
+            this.effects.put(EffectConstant.STATS_ADD_PROS, player.getClasseID() == Constant.CLASS_ENUTROF ? 120 : 100);
             this.effects.put(EffectConstant.STATS_ADD_PODS, 5000);
             this.effects.put(EffectConstant.STATS_CREATURE, 1);
             this.effects.put(EffectConstant.STATS_ADD_INIT, 1);

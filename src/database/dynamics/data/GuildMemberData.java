@@ -89,7 +89,7 @@ public class GuildMemberData extends AbstractDAO<Object> {
             p.setInt(4, gm.getLvl());
             int gfx = gm.getGfx();
             if (gfx > 121 || gfx < 10)
-                gfx = player.getClasse() * 10 + player.getSexe();
+                gfx = player.getClasseID() * 10 + player.getSexe();
             p.setInt(5, gfx);
             p.setInt(6, gm.getRank());
             p.setLong(7, gm.getXpGave());

@@ -224,7 +224,7 @@ public class PlayerData extends AbstractDAO<Player> {
             p.setInt(1, perso.getId());
             p.setString(2, perso.getName());
             p.setInt(3, perso.getSexe());
-            p.setInt(4, perso.getClasse());
+            p.setInt(4, perso.getClasseID());
             p.setInt(5, perso.getColor1());
             p.setInt(6, perso.getColor2());
             p.setInt(7, perso.getColor3());
@@ -373,7 +373,7 @@ public class PlayerData extends AbstractDAO<Player> {
         try (Connection conn = dataSource.getConnection() ; PreparedStatement p = conn.prepareStatement(query) ) {
             p.setString(1, perso.getName());
             p.setInt(2, perso.getSexe());
-            p.setInt(3, perso.getClasse());
+            p.setInt(3, perso.getClasseID());
             p.setString(4, perso.parseSpellToDB());
             p.setInt(5, perso.getId());
             executeUpdate(p);

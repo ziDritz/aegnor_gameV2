@@ -25,24 +25,24 @@ public class Dopeul {
 
     public static void getReward(Player player, int type) {
         GameMap curMap = player.getCurMap();
-        int idMap = World.world.getTempleByClasse(player.getClasse());
+        int idMap = World.world.getTempleByClasse(player.getClasseID());
         switch (type) {
             case 1://Sort sp�cial
-                if (!player.hasItemTemplate(getDoplonByClasse(player.getClasse()), 1)) { // Si on a pas le doplon de classe
+                if (!player.hasItemTemplate(getDoplonByClasse(player.getClasseID()), 1)) { // Si on a pas le doplon de classe
                     SocketManager.GAME_SEND_Im_PACKET(player, "14");
                     return;
                 } else if (curMap.getId() != (short) idMap) // Si on est pas dans le temple de notre classe
                 {
                     SocketManager.GAME_SEND_MESSAGE(player, "Tu n'es pas dans ton temple de classe !");
                     return;
-                } else if (player.hasSpell(Constant.getSpecialSpellByClasse(player.getClasse()))) // Si on a d�j� le sort
+                } else if (player.hasSpell(Constant.getSpecialSpellByClasse(player.getClasseID()))) // Si on a d�j� le sort
                 {
                     SocketManager.GAME_SEND_MESSAGE(player, "Tu as déjà appris le sort !");
                     return;
                 }
 
-                player.learnSpell(Constant.getSpecialSpellByClasse(player.getClasse()), 1, true, true, true);
-                removeObject(player, getDoplonByClasse(player.getClasse()), 1);
+                player.learnSpell(Constant.getSpecialSpellByClasse(player.getClasseID()), 1, true, true, true);
+                removeObject(player, getDoplonByClasse(player.getClasseID()), 1);
                 break;
 
             case 2://Trousseau de cl�s
@@ -63,8 +63,8 @@ public class Dopeul {
             case 3://Reset spell
                 ArrayList<Integer> doplons = hasQuaDoplon(player, 7);
 
-                if(doplons.contains(Dopeul.getDoplonByClasse(player.getClasse()))) {
-                    removeObject(player, Dopeul.getDoplonByClasse(player.getClasse()), 7);
+                if(doplons.contains(Dopeul.getDoplonByClasse(player.getClasseID()))) {
+                    removeObject(player, Dopeul.getDoplonByClasse(player.getClasseID()), 7);
                 } else {
                     doplons = Dopeul.hasQuaDoplon(player, 1);
                     if(doplons.size() == 12) {
@@ -80,7 +80,7 @@ public class Dopeul {
                 break;
 
             case 4://Reset caract�ristiques
-                if (!player.hasItemTemplate(getDoplonByClasse(player.getClasse()), 1)) {
+                if (!player.hasItemTemplate(getDoplonByClasse(player.getClasseID()), 1)) {
                     SocketManager.GAME_SEND_Im_PACKET(player, "14");
                     return;
                 } else if (curMap.getId() != (short) idMap) // Si on est pas dans le temple de notre classe
@@ -106,7 +106,7 @@ public class Dopeul {
                     World.world.addGameObject(obj2, true);
                 obj2.refreshStatsObjet("325" + System.currentTimeMillis());
                 SocketManager.GAME_SEND_STATS_PACKET(player);
-                removeObject(player, getDoplonByClasse(player.getClasse()), 1);
+                removeObject(player, getDoplonByClasse(player.getClasseID()), 1);
                 break;
 
             case 5://Guildalogemme

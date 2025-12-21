@@ -147,7 +147,7 @@ public class Action {
                 }
                 break;
             case -11: //T�l�portation map d�part � la cr�ation d'un personnage (?)
-                player.teleport(Constant.getStartMap(player.getClasse()), Constant.getStartCell(player.getClasse()));
+                player.teleport(Constant.getStartMap(player.getClasseID()), Constant.getStartCell(player.getClasseID()));
                 SocketManager.GAME_SEND_WELCOME(player);
                 break;
             case -10: //Alignement ange si plus de demon et vice-versa sinon random
@@ -1107,7 +1107,7 @@ public class Action {
                 break;
 
             case 25://SimpleUnMorph
-                int UnMorphID = player.getClasse() * 10 + player.getSexe();
+                int UnMorphID = player.getClasseID() * 10 + player.getSexe();
                 player.setGfxId(UnMorphID);
                 SocketManager.GAME_SEND_ERASE_ON_MAP_TO_MAP(player.getCurMap(), player.getId());
                 SocketManager.GAME_SEND_ADD_PLAYER_TO_MAP(player.getCurMap(), player);
@@ -2178,8 +2178,8 @@ public class Action {
                 break;
 
             case 229://Animation d'incarnam � astrub
-                short map = Constant.getClassStatueMap(player.getClasse());
-                int cell = Constant.getClassStatueCell(player.getClasse());
+                short map = Constant.getClassStatueMap(player.getClasseID());
+                int cell = Constant.getClassStatueCell(player.getClasseID());
                 SocketManager.GAME_SEND_GA_PACKET(player.getGameClient(), "", "2", player.getId()
                         + "", "7");
                 player.teleport(map, cell);

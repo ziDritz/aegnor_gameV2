@@ -328,9 +328,9 @@ public class CommandPlayer {
                 }
             }
             else if(command(msg, "demorph")) {
-                if(player.getGfxId() != player.getClasse() * 10)
+                if(player.getGfxId() != player.getClasseID() * 10)
                 {
-                    player.setGfxId(player.getClasse() * 10);
+                    player.setGfxId(player.getClasseID() * 10);
                 }
                 else{
                     SocketManager.GAME_SEND_MESSAGE(player, "Vous avez déjà le bon skin.");
