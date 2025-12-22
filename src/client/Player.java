@@ -605,7 +605,8 @@ public class Player {
 
         perso._sorts = Constant.getStartSorts(classe);
         for (int a = 1; a <= perso.getLevel(); a++)
-            Constant.onLevelUpSpells(perso, a);
+            perso.checkAndLearnSpell();
+            //Constant.onLevelUpSpells(perso, a);
         perso._sortsPlaces = Constant.getStartSortsPlaces(classe);
 
         SocketManager.GAME_SEND_WELCOME(perso);
@@ -3035,7 +3036,10 @@ public class Player {
             this.getStats().addOneStat(EffectConstant.STATS_ADD_PA, 1);
         if (this.getLevel() == 200)
             this.getStats().addOneStat(EffectConstant.STATS_ADD_PM, 1);
-        Constant.onLevelUpSpells(this, this.getLevel());
+        // Constant.onLevelUpSpells(this, this.getLevel());
+
+        checkAndLearnSpell();
+
         if (addXp)
             this.exp = World.world.getExpLevel(this.getLevel()).perso;
         if (send && isOnline) {
@@ -3049,6 +3053,13 @@ public class Player {
 
         return true;
     }
+
+    public void checkAndLearnSpell() {
+        if (classe.GetSorts().containsKey(this.level)) {
+            learnSpell(classe.GetSorts().get(this.level), 1, true, false, false);
+        }
+    }
+
     public boolean NerfSpell(int spellID)
     {
         if(getFight() != null)
@@ -6994,7 +7005,7 @@ public class Player {
         SocketManager.GAME_SEND_AC_CHANGE_CLASSE(this, getClasseID());
         this._sorts = Constant.getStartSorts(classeID);
         for (int a = 1; a <= this.getLevel(); a++) {
-            Constant.onLevelUpSpells(this, a);
+            checkAndLearnSpell();
         }
         this._sortsPlaces = Constant.getStartSortsPlaces(classeID);
         /*int spellpoints = 0;

@@ -4,7 +4,6 @@ import fight.spells.EffectConstant;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class Classe
 {
@@ -22,7 +21,7 @@ public class Classe
     private ArrayList<BoostStat> _boostAgi = new ArrayList<>();
     private  ArrayList<BoostStat> _boostChance = new ArrayList<>();
     private HashMap<Integer, Integer> _stats = new HashMap<>();
-    private HashMap<Integer, Integer> _sorts = new HashMap<>();
+    private HashMap<Integer, Integer> _sorts = new HashMap<>(); //  (<niveau d'obtention, spellID>)
 
     public Classe(int id, String name, String gfxs, String size, int MapInit, int CellInit, int pdv, String boostVita, String
                   boostSagesse, String boostForce, String boostIntel, String boostChance, String boostAgil, String stats
@@ -60,7 +59,7 @@ public class Classe
         }
         for (String s : sorts.split("\\|")) {
             try {
-                this._sorts.put(Integer.parseInt(s.split(",")[1]), Integer.parseInt(s.split(",")[0]));
+                this._sorts.put(Integer.parseInt(s.split(",")[0]), Integer.parseInt(s.split(",")[1]));
             } catch (Exception ignored) {
             }
         }
@@ -69,6 +68,12 @@ public class Classe
     {
         return this.id;
     }
+
+    public HashMap<Integer, Integer> GetSorts() {
+        return _sorts;
+    }
+
+
     public static final BoostStat BoostDefecto = new BoostStat(0, 1, 1);
     public static class BoostStat {
 
@@ -135,17 +140,6 @@ public class Classe
             }
         }
         return boost;
-    }
-
-    public Boolean aprenderHechizo(Player perso, int nivel) {
-    AtomicReference<Boolean> loop = new AtomicReference<>(false);
-    this._sorts.forEach((key, value) ->{
-        if (value == nivel) {
-            perso.learnSpell(key, 1);
-            loop.set(true);
-        }
-    });
-    return loop.get();
     }
 
     public int getGfxs(int index)
