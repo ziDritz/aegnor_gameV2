@@ -36,7 +36,8 @@ public class ClasseData extends AbstractDAO<Classe> {
                             , RS.getString("boostVita"), RS.getString("boostSage")
                             , RS.getString("boostForce"), RS.getString("boostIntel"), RS.getString("boostChance")
                             , RS.getString("boostAgi"), RS.getString("statsInit")
-                            , RS.getString("sorts")));
+                            , RS.getString("sorts")
+                            , RS.getString("startSorts")));
                     numero++;
                 }
             }

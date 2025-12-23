@@ -22,10 +22,11 @@ public class Classe
     private  ArrayList<BoostStat> _boostChance = new ArrayList<>();
     private HashMap<Integer, Integer> _stats = new HashMap<>();
     private HashMap<Integer, Integer> _sorts = new HashMap<>(); //  (<niveau d'obtention, spellID>)
+    private ArrayList<Integer> _startSorts = new ArrayList<>(); // <spellID>
 
     public Classe(int id, String name, String gfxs, String size, int MapInit, int CellInit, int pdv, String boostVita, String
                   boostSagesse, String boostForce, String boostIntel, String boostChance, String boostAgil, String stats
-    , String sorts)
+    , String sorts, String startSorts)
     {
         this.id = id;
         this.name = name;
@@ -63,6 +64,12 @@ public class Classe
             } catch (Exception ignored) {
             }
         }
+        for (String s : startSorts.split("\\|")) {
+            try {
+                this._startSorts.add(Integer.parseInt(s));
+            } catch (Exception ignored) {
+            }
+        }
     }
     public int getId()
     {
@@ -73,6 +80,9 @@ public class Classe
         return _sorts;
     }
 
+    public ArrayList<Integer> getStartSorts() {
+        return _startSorts;
+    }
 
     public static final BoostStat BoostDefecto = new BoostStat(0, 1, 1);
     public static class BoostStat {

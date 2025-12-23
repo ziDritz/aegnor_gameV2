@@ -603,11 +603,16 @@ public class Player {
                 + (startCell != 0 ? (short) startCell : Constant.getStartCell(classe)), "2,0;24,0;28,0;25,0;36,0;58,0;41,0;56,0;26,0;15,0;16,0;27,0;11,0;14,0;17,0;20,0;31,0;13,0;18,0;19,0;60,0;65,0;62,0;63,0;64,0;43,0;44,0;45,0;46,0;47,0;48,0;49,0;50,0", 0, -1, 0, 0, 0, z, (byte) 0, 0, "0;0", "", Config.INSTANCE.getALL_EMOTE() ? "0;1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21" : "0", 0, true, "118,0;119,0;123,0;124,0;125,0;126,0", 0, false, "0,0,0,0", (byte) 0, 0, 0);
         perso.emotes.add(1);
 
-        perso._sorts = Constant.getStartSorts(classe);
-        for (int a = 1; a <= perso.getLevel(); a++)
-            perso.checkAndLearnSpell();
-            //Constant.onLevelUpSpells(perso, a);
-        perso._sortsPlaces = Constant.getStartSortsPlaces(classe);
+
+        // Spell init
+        for (int spellID : perso.classe.getStartSorts()) {
+            perso.learnSpell(spellID, 1, true, false, false);
+        }
+
+        for (int a = 1; a <= perso.getLevel(); a++) {
+            perso.checkAndLearnSpell(a);
+        }
+
 
         SocketManager.GAME_SEND_WELCOME(perso);
 
@@ -3057,6 +3062,12 @@ public class Player {
     public void checkAndLearnSpell() {
         if (classe.GetSorts().containsKey(this.level)) {
             learnSpell(classe.GetSorts().get(this.level), 1, true, false, false);
+        }
+    }
+
+    public void checkAndLearnSpell(int level) {
+        if (classe.GetSorts().containsKey(level)) {
+            learnSpell(classe.GetSorts().get(level), 1, true, false, false);
         }
     }
 
@@ -5623,8 +5634,13 @@ public class Player {
             this.getStats().addOneStat(126, -this.getStats().getEffect(126));
             this.addCapital((this.getLevel() - 1) * 5 - this.get_capital());
             this.getStatsParcho().getEffects().clear();
-            this._sorts = Constant.getStartSorts(classeID);
-            this._sortsPlaces = Constant.getStartSortsPlaces(classeID);
+            // Spell reset and init
+            _sorts.clear();
+
+            for (int spellID : classe.getStartSorts()) {
+                learnSpell(spellID, 1, true, false, false);
+            }
+            //this._sortsPlaces = Constant.getStartSortsPlaces(classeID);
             this.level = 1;
             this.exp = 0;
             this.curMap = World.world.getMap(Constant.getStartMap(this.classeID));
@@ -7001,19 +7017,20 @@ public class Player {
         }
 
         this.setClasseID(clase);
-        //Clase = Mundo.getClase(ClaseID);
+        classe = World.world.getClasse(classeID);
         SocketManager.GAME_SEND_AC_CHANGE_CLASSE(this, getClasseID());
-        this._sorts = Constant.getStartSorts(classeID);
+
+        // Spell reset and init
+        _sorts.clear();
+
+        for (int spellID : classe.getStartSorts()) {
+            learnSpell(spellID, 1, true, false, false);
+        }
+
         for (int a = 1; a <= this.getLevel(); a++) {
-            checkAndLearnSpell();
+            checkAndLearnSpell(a);
         }
-        this._sortsPlaces = Constant.getStartSortsPlaces(classeID);
-        /*int spellpoints = 0;
-        for(int i = 2; i < 201; i++)
-        {
-            spellpoints += 1;
-        }
-        this._spellPts = spellpoints;*/
+
         if(isOnline)
         {
             SocketManager.GAME_SEND_SL_LISTE_SORTS(this);
