@@ -606,7 +606,8 @@ public class Player {
 
         // Spell init
         for (int spellID : perso.classe.getStartSorts()) {
-            perso.learnSpell(spellID, 1, true, false, false);
+            char c = perso.getNextFreeSortPlace();
+            perso.learnSpell(spellID, 1, c);
         }
 
         for (int a = 1; a <= perso.getLevel(); a++) {
@@ -1592,6 +1593,27 @@ public class Player {
             _sortsPlaces.clear();
         SocketManager.GAME_SEND_SPELL_LIST(this);
     }
+
+
+    /**
+     * @return next free sort place, or '\0' if none is available
+     */
+
+    public char getNextFreeSortPlace() {
+        for (char c : Constant.SPELL_PLACES) {
+
+            // Avoid CAC place
+            if (c == 'a') {
+                continue;
+            }
+
+            if (!_sortsPlaces.containsValue(c)) {
+                return c;
+            }
+        }
+        return '\0';
+    }
+
 
     public void learnSpell(int spell, int level, char pos) {
         if (World.world.getSort(spell).getStatsByLevel(level) == null) {
@@ -3041,7 +3063,7 @@ public class Player {
             this.getStats().addOneStat(EffectConstant.STATS_ADD_PA, 1);
         if (this.getLevel() == 200)
             this.getStats().addOneStat(EffectConstant.STATS_ADD_PM, 1);
-        // Constant.onLevelUpSpells(this, this.getLevel());
+
 
         checkAndLearnSpell();
 
@@ -3061,13 +3083,15 @@ public class Player {
 
     public void checkAndLearnSpell() {
         if (classe.GetSorts().containsKey(this.level)) {
-            learnSpell(classe.GetSorts().get(this.level), 1, true, false, false);
+            char c = getNextFreeSortPlace();
+            learnSpell(classe.GetSorts().get(this.level), 1, c);
         }
     }
 
     public void checkAndLearnSpell(int level) {
         if (classe.GetSorts().containsKey(level)) {
-            learnSpell(classe.GetSorts().get(level), 1, true, false, false);
+            char c = getNextFreeSortPlace();
+            learnSpell(classe.GetSorts().get(level), 1, c);
         }
     }
 
@@ -5638,7 +5662,8 @@ public class Player {
             _sorts.clear();
 
             for (int spellID : classe.getStartSorts()) {
-                learnSpell(spellID, 1, true, false, false);
+                char c = getNextFreeSortPlace();
+                learnSpell(spellID, 1, c);
             }
             //this._sortsPlaces = Constant.getStartSortsPlaces(classeID);
             this.level = 1;
@@ -7022,9 +7047,11 @@ public class Player {
 
         // Spell reset and init
         _sorts.clear();
+        _sortsPlaces.clear();
 
         for (int spellID : classe.getStartSorts()) {
-            learnSpell(spellID, 1, true, false, false);
+            char c = getNextFreeSortPlace();
+            learnSpell(spellID, 1, c);
         }
 
         for (int a = 1; a <= this.getLevel(); a++) {
