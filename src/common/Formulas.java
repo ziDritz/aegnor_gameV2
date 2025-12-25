@@ -1255,7 +1255,7 @@ public class Formulas {
     public static int totalCaptChance(int pierreChance, Player p) {
         int sortChance = 0;
 
-        switch (p.getSortStatBySortIfHas(413).getLevel()) {
+        switch (p.spellBook.getSortStatBySortIfHas(413).getLevel()) {
             case 1:
                 sortChance = 1;
                 break;
@@ -1303,7 +1303,7 @@ public class Formulas {
                                        boolean Doree, Player p) {
         int sortChance = 0;
         int ddChance = 0;
-        switch (p.getSortStatBySortIfHas(414).getLevel()) {
+        switch (p.spellBook.getSortStatBySortIfHas(414).getLevel()) {
             case 1:
                 sortChance = 15;
                 break;

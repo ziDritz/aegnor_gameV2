@@ -35,13 +35,18 @@ public class Dopeul {
                 {
                     SocketManager.GAME_SEND_MESSAGE(player, "Tu n'es pas dans ton temple de classe !");
                     return;
-                } else if (player.hasSpell(Constant.getSpecialSpellByClasse(player.getClasseID()))) // Si on a d�j� le sort
-                {
-                    SocketManager.GAME_SEND_MESSAGE(player, "Tu as déjà appris le sort !");
-                    return;
+                } else {
+                    int spellID = Constant.getSpecialSpellByClasse(player.getClasseID());
+                    if (player.spellBook.hasSpell(spellID)) // Si on a d�j� le sort
+                    {
+                        SocketManager.GAME_SEND_MESSAGE(player, "Tu as déjà appris le sort !");
+                        return;
+                    }
                 }
 
-                player.learnSpell(Constant.getSpecialSpellByClasse(player.getClasseID()), 1, true, true, true);
+                int spellID = Constant.getSpecialSpellByClasse(player.getClasseID());
+
+                player.spellBook.learnSpell(spellID, 1, true, true, true);
                 removeObject(player, getDoplonByClasse(player.getClasseID()), 1);
                 break;
 

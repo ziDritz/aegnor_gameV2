@@ -2259,7 +2259,7 @@ public class CommandAdmin extends AdminUser {
                     return;
                 }
             }
-            perso.addSpellPoint(pts);
+            perso.spellBook.addSpellPoint(pts);
             SocketManager.GAME_SEND_STATS_PACKET(perso);
             String str = "Vous avez ajoute " + pts + " points de sorts e "
                     + perso.getName() + ".";
@@ -2328,7 +2328,8 @@ public class CommandAdmin extends AdminUser {
                     return;
                 }
             }
-            perso.learnSpell(spell, 1, true, true, true);
+
+            perso.spellBook.learnSpell(spell, 1, true, true, true);
             String str = "Le sort " + spell + " a ete appris e "
                     + perso.getName() + ".";
             this.sendMessage(str);

@@ -61,9 +61,10 @@ public class Start {
 			try { Thread.sleep(2000); } catch (InterruptedException ignored) {}
 			map = mapUse.get(1);
 			helper = map.addNpc(15020, (short) 179, 3);
-			player.setSpellsPlace(false);
-			Start.this.player.unlearnSpell(661);
-			Start.this.player.teleport(map, 224);
+				player.spellBook.setSpellsPlace(false);
+
+				Start.this.player.spellBook.unlearnSpell(661);
+                Start.this.player.teleport(map, 224);
 			Start.this.player.setBlockMovement(true);
 			SocketManager.GAME_SEND_ADD_NPC(Start.this.player, Start.this.helper);
 			try { Thread.sleep(5000); } catch (InterruptedException ignored) {}
@@ -146,8 +147,9 @@ public class Start {
 			try { Thread.sleep(4000); } catch (InterruptedException ignored) {}
 			SocketManager.GAME_SEND_cMK_PACKET(player, "", helper.getId(), "Ganymede", "Pour t'exercer, je te prête mon sort d'entrainement.");
 			try { Thread.sleep(1500); } catch (InterruptedException ignored) {}
-			Start.this.player.learnSpell(661, 1, 'b');
-			player.setBlockMovement(false);
+
+				Start.this.player.spellBook.learnSpell(661, 1, 'b');
+				player.setBlockMovement(false);
 			try { Thread.sleep(2500); } catch (InterruptedException ignored) {}
 			
 			SocketManager.GAME_SEND_cMK_PACKET(player, "", helper.getId(), "Ganymede", "Prenons notre ami l'épouvantail ...");
@@ -188,8 +190,9 @@ public class Start {
 			try { Thread.sleep(5000); } catch (InterruptedException ignored) {}
 			SocketManager.GAME_SEND_cMK_PACKET(player, "", helper.getId(), "Ganymede", "Tu es maintenant prêt à faire ton premier combat.");
 			try { Thread.sleep(3000); } catch (InterruptedException ignored) {}
-			Start.this.player.unlearnSpell(661);
-			SocketManager.GAME_SEND_cMK_PACKET(player, "", helper.getId(), "Ganymede", "Je vais donc reprendre mon sort d'entrainement.");
+
+                Start.this.player.spellBook.unlearnSpell(661);
+                SocketManager.GAME_SEND_cMK_PACKET(player, "", helper.getId(), "Ganymede", "Je vais donc reprendre mon sort d'entrainement.");
 			try { Thread.sleep(3000); } catch (InterruptedException ignored) {}
 			mapUse.get(2).getCase(177).addOnCellStopAction(999, "388", "-1", mapUse.get(3));
 			SocketManager.GAME_SEND_cMK_PACKET(player, "", helper.getId(), "Ganymede", "Suis-moi dans la prochaine salle, tu auras 3 nouveaux sorts.");
@@ -219,8 +222,8 @@ public class Start {
 			try { Thread.sleep(3000); } catch (InterruptedException ignored) {}
 			SocketManager.GAME_SEND_cMK_PACKET(player, "", helper.getId(), "Ganymede", "Bien, tu sais désormais comment te battre contre un ennemi.");
 			try { Thread.sleep(3000); } catch (InterruptedException ignored) {}
-			player.setSpellsPlace(true);
-			SocketManager.GAME_SEND_cMK_PACKET(player, "", helper.getId(), "Ganymede", "Je viens de te donner tes trois premiers sorts.");
+				player.spellBook.setSpellsPlace(true);
+				SocketManager.GAME_SEND_cMK_PACKET(player, "", helper.getId(), "Ganymede", "Je viens de te donner tes trois premiers sorts.");
 			try { Thread.sleep(3000); } catch (InterruptedException ignored) {}
 			SocketManager.GAME_SEND_cMK_PACKET(player, "", helper.getId(), "Ganymede", "Utilise les pour combattre l'Arakne qui se trouve dans cette pièce.");
 			try { Thread.sleep(3000); } catch (InterruptedException ignored) {}

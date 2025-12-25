@@ -7,10 +7,7 @@ import area.map.entity.InteractiveObject;
 import area.map.entity.MountPark;
 import area.map.labyrinth.Minotoror;
 import area.map.labyrinth.PigDragon;
-import client.other.Party;
-import client.other.Restriction;
-import client.other.Stalk;
-import client.other.Stats;
+import client.other.*;
 import command.administration.Group;
 import common.Formulas;
 import common.SocketManager;
@@ -29,7 +26,6 @@ import fight.arena.DeathMatch;
 import fight.arena.TeamMatch;
 import fight.spells.Effect;
 import fight.spells.EffectConstant;
-import fight.spells.SpellBook;
 import fight.spells.SpellGrade;
 import game.GameClient;
 import game.GameServer;
@@ -89,16 +85,7 @@ public class Player {
     public boolean isXpOffilike = false;
     
     private PlayerWallet wallet;
-    // SpellBook
-    private SpellBook spellBook;
-    private int _spellPts;
-    private Map<Integer, SpellGrade> _sorts = new HashMap<Integer, SpellGrade>();
-    private Map<Integer, Character> _sortsPlaces = new HashMap<Integer, Character>();
-    private Map<Integer, HashMap<Integer, Integer>> objectsClassSpell = new HashMap<>();
-    private Map<Integer, SpellGrade> _saveSorts = new HashMap<Integer, SpellGrade>();
-    private Map<Integer, Character> _saveSortsPlaces = new HashMap<Integer, Character>();
-    private int _saveSpellPts;
-    private Map<Integer, Effect> buffs = new HashMap<Integer, Effect>();
+    public SpellBook spellBook;
     // private int pa = 0;
     //Job
     private JobAction _curJobAction;
@@ -318,6 +305,7 @@ public class Player {
         this.color2 = color2;
         this.color3 = color3;
         this.wallet = new PlayerWallet(this, startKamas);
+        this.spellBook = new SpellBook(this);
         this._capital = _capital;
         this._align = alignement;
         this._honor = honor;
@@ -375,9 +363,9 @@ public class Player {
                     _morphId = Integer.parseInt(i[1]);
             }
             if (_morphMode)
-                this._saveSpellPts = pts;
+                this.spellBook._saveSpellPts = pts;
             else
-                this._spellPts = pts;
+                this.spellBook.set_spellPts(pts);
 
             if (prison != 0) {
                 this.isInEnnemyFaction = true;
@@ -495,7 +483,7 @@ public class Player {
                 this.curPdv = (this.maxPdv * pdvPer / 100);
             if (this.curPdv <= 0)
                 this.curPdv = 1;
-            parseSpells(spells);
+            spellBook.parseSpells(spells);
 
             String jobs2 = "2,0;24,0;28,0;25,0;36,0;58,0;41,0;56,0;26,0;15,0;16,0;27,0;11,0;14,0;17,0;20,0;31,0;13,0;18,0;19,0;60,0;65,0;62,0;63,0;64,0;43,0;44,0;45,0;46,0;47,0;48,0;49,0;50,0";
             //Chargement de tous les métier
@@ -608,12 +596,13 @@ public class Player {
 
         // Spell init
         for (int spellID : perso.classe.getStartSorts()) {
-            char c = perso.getNextFreeSortPlace();
-            perso.learnSpell(spellID, 1, c);
+            char c = perso.spellBook.getNextFreeSortPlace();
+
+            perso.spellBook.learnSpell(spellID, 1, c);
         }
 
         for (int a = 1; a <= perso.getLevel(); a++) {
-            perso.checkAndLearnSpell(a);
+            perso.spellBook.checkAndLearnSpell(a);
         }
 
 
@@ -664,10 +653,10 @@ public class Player {
             if (st == null) {
                 continue;
             }
-            learnSpell(st.getSpellID(), st.getLevel(), Constant.SPELL_PLACES.get(i+1));
+            spellBook.learnSpell(st.getSpellID(), st.getLevel(), Constant.SPELL_PLACES.get(i + 1));
             i++;
         }
-        _saveSorts.putAll(mobModelo.getSpells());
+        spellBook._saveSorts.putAll(mobModelo.getSpells());
     }
 
     public void modifStatByInvocator(Fighter caster, Monster.MobGrade MobModelo) {
@@ -1242,8 +1231,8 @@ public class Player {
 
     private void parseSpellsFullMorph(String str) {
         String[] spells = str.split(",");
-        _sorts.clear();
-        _sortsPlaces.clear();
+        spellBook._sorts.clear();
+        spellBook._sortsPlaces.clear();
         for (String e : spells) {
             try {
                 int id = Integer.parseInt(e.split(";")[0]);
@@ -1251,10 +1240,10 @@ public class Player {
                 char place = e.split(";")[2].charAt(0);
 
                 if (!_morphMode)
-                    learnSpell(id, lvl, false, false, false);
+                    spellBook.learnSpell(id, lvl, false, false, false);
                 else
-                    learnSpell(id, lvl, false, true, false);
-                _sortsPlaces.put(id, place);
+                    spellBook.learnSpell(id, lvl, false, true, false);
+                spellBook._sortsPlaces.put(id, place);
             } catch (NumberFormatException e1) {
                 e1.printStackTrace();
             }
@@ -1263,8 +1252,8 @@ public class Player {
 
     private void parseSpellsFullMorphGladia(String str) {
         String[] spells = str.split(",");
-        _sorts.clear();
-        _sortsPlaces.clear();
+        spellBook._sorts.clear();
+        spellBook._sortsPlaces.clear();
         for (String e : spells) {
             try {
                 int id = Integer.parseInt(e.split(";")[0]);
@@ -1273,9 +1262,9 @@ public class Player {
 
                 char place = Constant.SPELL_PLACES.get(placeid);
 
-                learnSpell(id, lvl, false, false, false);
+                spellBook.learnSpell(id, lvl, false, false, false);
 
-                _sortsPlaces.put(id, place);
+                spellBook._sortsPlaces.put(id, place);
             } catch (NumberFormatException e1) {
                 e1.printStackTrace();
             }
@@ -1283,341 +1272,6 @@ public class Player {
         SocketManager.GAME_SEND_SPELL_LIST(this);
     }
 
-    // SpellBook
-
-
-    public String parseSpellToDB() {
-        StringBuilder sorts = new StringBuilder();
-
-        if (_morphMode) {
-            if (_saveSorts.isEmpty())
-                return "";
-            for (int key : _saveSorts.keySet()) {
-                //3;1;a,4;3;b
-                SpellGrade SS = _saveSorts.get(key);
-                if (SS == null)
-                    continue;
-                sorts.append(SS.getSpellID()).append(";").append(SS.getLevel()).append(";");
-                if (_saveSortsPlaces.get(key) != null)
-                    sorts.append(_saveSortsPlaces.get(key));
-                else
-                    sorts.append("_");
-                sorts.append(",");
-            }
-        } else {
-            if (_sorts.isEmpty())
-                return "";
-            for (int key : _sorts.keySet()) {
-                //3;1;a,4;3;b
-                SpellGrade SS = _sorts.get(key);
-                if (SS == null)
-                    continue;
-                sorts.append(SS.getSpellID()).append(";").append(SS.getLevel()).append(";");
-                if (_sortsPlaces.get(key) != null)
-                    sorts.append(_sortsPlaces.get(key));
-                else
-                    sorts.append("_");
-                sorts.append(",");
-            }
-        }
-        return sorts.substring(0, sorts.length() - 1);
-    }
-
-    private void parseSpells(String str) {
-        if (!str.equalsIgnoreCase("")) {
-            if (_morphMode) {
-                String[] spells = str.split(",");
-                _saveSorts.clear();
-                _saveSortsPlaces.clear();
-                for (String e : spells) {
-                    try {
-                        int id = Integer.parseInt(e.split(";")[0]);
-                        int lvl = Integer.parseInt(e.split(";")[1]);
-                        char place = e.split(";")[2].charAt(0);
-                        learnSpell(id, lvl);
-                        this._saveSortsPlaces.put(id, place);
-                    } catch (NumberFormatException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-            } else {
-                String[] spells = str.split(",");
-                _sorts.clear();
-                _sortsPlaces.clear();
-                for (String e : spells) {
-                    try {
-                        int id = Integer.parseInt(e.split(";")[0]);
-                        int lvl = Integer.parseInt(e.split(";")[1]);
-                        char place = e.split(";")[2].charAt(0);
-                        if (!_morphMode)
-                            learnSpell(id, lvl, false, false, false);
-                        else
-                            learnSpell(id, lvl, false, true, false);
-                        _sortsPlaces.put(id, place);
-                    } catch (NumberFormatException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-            }
-        }
-    }
-
-    public Map<Integer, Effect> get_buff() {
-        return buffs;
-    }
-
-    public int get_spellPts() {
-        if (_morphMode)
-            return _saveSpellPts;
-        else
-            return _spellPts;
-    }
-
-    public void set_spellPts(int pts) {
-        if (_morphMode)
-            _saveSpellPts = pts;
-        else
-            _spellPts = pts;
-    }
-
-    public void setSpellsPlace(boolean ok) {
-        if (ok)
-            _sortsPlaces = Constant.getStartSortsPlaces(this.getClasseID());
-        else
-            _sortsPlaces.clear();
-        SocketManager.GAME_SEND_SPELL_LIST(this);
-    }
-
-    /**
-     * @return next free sort place, or '\0' if none is available
-     */
-
-    public char getNextFreeSortPlace() {
-        for (char c : Constant.SPELL_PLACES) {
-
-            // Avoid CAC place
-            if (c == 'a') {
-                continue;
-            }
-
-            if (!_sortsPlaces.containsValue(c)) {
-                return c;
-            }
-        }
-        return '\0';
-    }
-
-    public void learnSpell(int spell, int level, char pos) {
-        if (World.world.getSort(spell).getStatsByLevel(level) == null) {
-            GameServer.a("LearnSpell " + spell + " level " + level);
-            return;
-        }
-
-        if (!_sorts.containsKey(spell)) {
-            _sorts.put(spell, World.world.getSort(spell).getStatsByLevel(level));
-            replace_SpellInBook(pos);
-            _sortsPlaces.remove(spell);
-            _sortsPlaces.put(spell, pos);
-            SocketManager.GAME_SEND_SPELL_LIST(this);
-            SocketManager.GAME_SEND_Im_PACKET(this, "03;" + spell);
-        }
-    }
-
-    public boolean learnSpell(int spellID, int level, boolean save,
-                              boolean send, boolean learn) {
-
-        if (World.world.getSort(spellID).getStatsByLevel(level) == null) {
-            GameServer.a("Learn Spell " + spellID + " level "+ level + "/ Pas définie");
-            return false;
-        }
-
-        if (_sorts.containsKey(Integer.valueOf(spellID)) && learn) {
-            SocketManager.GAME_SEND_MESSAGE(this, "Tu posséde déjà ce sort.");
-            return false;
-        } else {
-            _sorts.put(Integer.valueOf(spellID), World.world.getSort(spellID).getStatsByLevel(level));
-            if (send) {
-                SocketManager.GAME_SEND_SPELL_LIST(this);
-                SocketManager.GAME_SEND_Im_PACKET(this, "03;" + spellID);
-            }
-            if (save)
-                Database.getStatics().getPlayerData().update(this);
-            return true;
-        }
-    }
-
-    public boolean learnSpell(int spellID, int level) {
-        if (World.world.getSort(spellID).getStatsByLevel(level) == null) {
-            GameServer.a("Learn Spell " + spellID + " level "+ level + "/ Pas définie");
-            return false;
-        }
-
-        if (_saveSorts.containsKey(Integer.valueOf(spellID))) {
-            return false;
-        } else {
-            _saveSorts.put(Integer.valueOf(spellID), World.world.getSort(spellID).getStatsByLevel(level));
-            return true;
-        }
-    }
-
-    public boolean unlearnSpell(int spell) {
-        if (World.world.getSort(spell) == null) {
-            GameServer.a("Learn Spell " + spell +"/ Pas définie");
-            return false;
-        }
-
-        _sorts.remove(spell);
-        this._sortsPlaces.remove(spell);
-        SocketManager.GAME_SEND_SPELL_LIST(this);
-        SocketManager.GAME_SEND_STATS_PACKET(this);
-        Database.getStatics().getPlayerData().update(this);
-        return true;
-    }
-
-    public boolean unlearnSpell(Player perso, int spellID, int level,
-                                int ancLevel, boolean save, boolean send) {
-        int spellPoint = 1;
-        if (ancLevel == 2)
-            spellPoint = 1;
-        if (ancLevel == 3)
-            spellPoint = 2 + 1;
-        if (ancLevel == 4)
-            spellPoint = 3 + 3;
-        if (ancLevel == 5)
-            spellPoint = 4 + 6;
-        if (ancLevel == 6)
-            spellPoint = 5 + 10;
-
-        if (World.world.getSort(spellID).getStatsByLevel(level) == null) {
-            GameServer.a("Learn Spell " + spellID + " level "+ level + "/ Pas définie");
-            return false;
-        }
-
-        _sorts.put(Integer.valueOf(spellID), World.world.getSort(spellID).getStatsByLevel(level));
-        if (send) {
-            SocketManager.GAME_SEND_SPELL_LIST(this);
-            SocketManager.GAME_SEND_Im_PACKET(this, "0154;" + "<b>" + ancLevel
-                    + "</b>" + "~" + "<b>" + spellPoint + "</b>");
-            addSpellPoint(spellPoint);
-            SocketManager.GAME_SEND_STATS_PACKET(perso);
-        }
-        if (save)
-            Database.getStatics().getPlayerData().update(this);
-        return true;
-    }
-
-    public boolean boostSpell(int spellID) {
-        if (getSortStatBySortIfHas(spellID) == null)
-            return false;
-        int AncLevel = getSortStatBySortIfHas(spellID).getLevel();
-        if (AncLevel == 6)
-            return false;
-        if (_spellPts >= AncLevel && World.world.getSort(spellID).getStatsByLevel(AncLevel + 1).getReqLevel() <= this.getLevel()) {
-            if (learnSpell(spellID, AncLevel + 1, true, false, false)) {
-                _spellPts -= AncLevel;
-                Database.getStatics().getPlayerData().update(this);
-                return true;
-            } else {
-                return false;
-            }
-        } else
-        //Pas le niveau ou pas les Points
-        {
-            if (_spellPts < AncLevel)
-                if (World.world.getSort(spellID).getStatsByLevel(AncLevel + 1).getReqLevel() > this.getLevel())
-                    return false;
-        }
-        return away;
-    }
-
-    public void boostSpellIncarnation() {
-        for (Entry<Integer, SpellGrade> i : _sorts.entrySet()) {
-            if (getSortStatBySortIfHas(i.getValue().getSpell().getSpellID()) == null)
-                continue;
-            if (learnSpell(i.getValue().getSpell().getSpellID(), i.getValue().getLevel() + 1, true, false, false))
-                Database.getStatics().getPlayerData().update(this);
-        }
-    }
-
-    public boolean forgetSpell(int spellID) {
-        if (getSortStatBySortIfHas(spellID) == null) {
-            return false;
-        }
-        int AncLevel = getSortStatBySortIfHas(spellID).getLevel();
-        if (AncLevel <= 1)
-            return false;
-
-        if (learnSpell(spellID, 1, true, false, false)) {
-            _spellPts += Formulas.spellCost(AncLevel);
-            Database.getStatics().getPlayerData().update(this);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public void set_SpellPlace(int SpellID, char Place) {
-        replace_SpellInBook(Place);
-        _sortsPlaces.remove(SpellID);
-        _sortsPlaces.put(SpellID, Place);
-        Database.getStatics().getPlayerData().update(this);
-    }
-
-    private void replace_SpellInBook(char Place) {
-        for (int key : _sorts.keySet())
-            if (_sortsPlaces.get(key) != null)
-                if (_sortsPlaces.get(key).equals(Place))
-                    _sortsPlaces.remove(key);
-    }
-
-    public SpellGrade getSortStatBySortIfHas(int spellID) {
-        return _sorts.get(spellID);
-    }
-
-    public void checkAndLearnSpell() {
-        if (classe.GetSorts().containsKey(this.level)) {
-            char c = getNextFreeSortPlace();
-            learnSpell(classe.GetSorts().get(this.level), 1, c);
-        }
-    }
-
-    public void checkAndLearnSpell(int level) {
-        if (classe.GetSorts().containsKey(level)) {
-            char c = getNextFreeSortPlace();
-            learnSpell(classe.GetSorts().get(level), 1, c);
-        }
-    }
-
-    public boolean NerfSpell(int spellID)
-    {
-        if(getFight() != null)
-            return false;
-        int antNivel = getSortStatBySortIfHas(spellID).getLevel();
-        if (antNivel <= 1)
-            return false;
-        if (learnSpell(spellID, (antNivel-1), true, false, false)) {
-            int total = 0;
-            for (int i = (antNivel-1); i < antNivel; i++)
-                total += i;
-            _spellPts += total;
-            Database.getStatics().getPlayerData().update(this);
-            SocketManager.GAME_SEND_STATS_PACKET(this);
-            SocketManager.GAME_SEND_SPELL_LIST(this);
-            return true;
-        }
-        return false;
-    }
-
-    public void addSpellPoint(int pts) {
-        if (_morphMode)
-            _saveSpellPts += pts;
-        else
-            _spellPts += pts;
-    }
-
-    public boolean hasSpell(int spellID) {
-        return (getSortStatBySortIfHas(spellID) != null);
-    }
 
     public void teleportOldMap() {
         this.teleport(oldMap, oldCell);
@@ -1854,21 +1508,21 @@ public class Player {
 
         if (!join) {
             if (!_morphMode) {
-                _saveSpellPts = _spellPts;
-                _saveSorts.putAll(_sorts);
-                _saveSortsPlaces.putAll(_sortsPlaces);
+                spellBook._saveSpellPts = spellBook.get_spellPts();
+                spellBook._saveSorts.putAll(spellBook._sorts);
+                spellBook._saveSortsPlaces.putAll(spellBook._sortsPlaces);
             }
             if (isLoad) {
-                _saveSpellPts = _spellPts;
-                _saveSorts.putAll(_sorts);
-                _saveSortsPlaces.putAll(_sortsPlaces);
+                spellBook._saveSpellPts = spellBook.get_spellPts();
+                spellBook._saveSorts.putAll(spellBook._sorts);
+                spellBook._saveSortsPlaces.putAll(spellBook._sortsPlaces);
             }
         }
 
         _morphMode = true;
-        _sorts.clear();
-        _sortsPlaces.clear();
-        _spellPts = 0;
+        spellBook._sorts.clear();
+        spellBook._sortsPlaces.clear();
+        spellBook.set_spellPts(0);
 
         if( 10 <= Integer.parseInt(fullMorph.get("gfxid")) && Integer.parseInt(fullMorph.get("gfxid")) <= 120) {
             setGfxId(Integer.parseInt(fullMorph.get("gfxid"))+this.getSexe());
@@ -1898,7 +1552,7 @@ public class Player {
             if (Constant.isIncarnationWeapon(this.getObjetByPos(Constant.ITEM_POS_ARME).getTemplate().getId()))
                 for (int i = 0; i <= this.getObjetByPos(Constant.ITEM_POS_ARME).getSoulStat().get(Constant.STATS_NIVEAU); i++)
                     if (i == 10 || i == 20 || i == 30 || i == 40 || i == 50)
-                        boostSpellIncarnation();
+                        spellBook.boostSpellIncarnation();
 
         if (this.fight == null && !Constant.isGladiatroolWeapon(this.getObjetByPos(Constant.ITEM_POS_ARME).getTemplate().getId())) {
             SocketManager.GAME_SEND_ASK(this.getGameClient(), this);
@@ -1966,12 +1620,12 @@ public class Player {
         donjon = false;
         _morphMode = false;
         this.useCac = true;
-        _sorts.clear();
-        _sortsPlaces.clear();
-        _spellPts = _saveSpellPts;
-        _sorts.putAll(_saveSorts);
-        _sortsPlaces.putAll(_saveSortsPlaces);
-        parseSpells(parseSpellToDB());
+        spellBook._sorts.clear();
+        spellBook._sortsPlaces.clear();
+        spellBook.set_spellPts(spellBook._saveSpellPts);
+        spellBook._sorts.putAll(spellBook._saveSorts);
+        spellBook._sortsPlaces.putAll(spellBook._saveSortsPlaces);
+        spellBook.parseSpells(spellBook.parseSpellToDB());
 
         setMorphId(0);
         if (this.getFight() == null) {
@@ -1985,9 +1639,9 @@ public class Player {
     public String parseSpellList() {
         StringBuilder packet = new StringBuilder();
         packet.append("SL");
-        for (Iterator<SpellGrade> i = _sorts.values().iterator(); i.hasNext(); ) {
+        for (Iterator<SpellGrade> i = spellBook._sorts.values().iterator(); i.hasNext(); ) {
             SpellGrade SS = i.next();
-            packet.append(SS.getSpellID()).append("~").append(SS.getLevel()).append("~").append(_sortsPlaces.get(SS.getSpellID())).append(";");
+            packet.append(SS.getSpellID()).append("~").append(SS.getLevel()).append("~").append(spellBook._sortsPlaces.get(SS.getSpellID())).append(";");
         }
         return packet.toString();
     }
@@ -2437,7 +2091,7 @@ public class Player {
         refreshLife(true);
         StringBuilder ASData = new StringBuilder();
         ASData.append("As").append(xpString(",")).append("|");
-        ASData.append(getKamas()).append("|").append(_capital).append("|").append(_spellPts).append("|");
+        ASData.append(getKamas()).append("|").append(_capital).append("|").append(spellBook.get_spellPts()).append("|");
         ASData.append(_align).append("~").append(_align).append(",").append(_aLvl).append(",").append(getGrade()).append(",").append(_honor).append(",").append(_deshonor).append(",").append((_showWings ? "1" : "0")).append("|");
         int pdv = this.curPdv;
         int pdvMax = this.maxPdv;
@@ -2516,7 +2170,7 @@ public class Player {
         refreshLife(true);
         StringBuilder ASData = new StringBuilder();
         ASData.append("As").append(xpString(",")).append("|");
-        ASData.append(getKamas()).append("|").append(_capital).append("|").append(_spellPts).append("|");
+        ASData.append(getKamas()).append("|").append(_capital).append("|").append(spellBook.get_spellPts()).append("|");
         ASData.append(_align).append("~").append(_align).append(",").append(_aLvl).append(",").append(getGrade()).append(",").append(_honor).append(",").append(_deshonor).append(",").append((_showWings ? "1" : "0")).append("|");
         int pdv = this.curPdv;
         int pdvMax = this.maxPdv;
@@ -2637,7 +2291,7 @@ public class Player {
                 for (Effect entry : this.fight.getFighterByPerso(this).getFightBuff())
                     stats.addOneStat(entry.getEffectID(), entry.getFixvalue());
 
-        for (Entry<Integer, Effect> entry : buffs.entrySet())
+        for (Entry<Integer, Effect> entry : spellBook.buffs.entrySet())
             stats.addOneStat(entry.getValue().getEffectID(), entry.getValue().getFixvalue());
         return stats;
     }
@@ -3082,7 +2736,7 @@ public class Player {
             return false;
         this.level++;
         _capital += 5;
-        _spellPts++;
+        spellBook.set_spellPts(spellBook.get_spellPts() + 1);
         this.maxPdv += 5;
         this.setPdv(this.getMaxPdv());
         if (this.getLevel() == 100)
@@ -3091,7 +2745,7 @@ public class Player {
             this.getStats().addOneStat(EffectConstant.STATS_ADD_PM, 1);
 
 
-        checkAndLearnSpell();
+        spellBook.checkAndLearnSpell();
 
         if (addXp)
             this.exp = World.world.getExpLevel(this.getLevel()).perso;
@@ -3123,7 +2777,7 @@ public class Player {
         if (_morphMode != true) {
             str.append("0|0|");
         } else {
-            str.append(_capital).append("|").append(_spellPts).append("|");
+            str.append(_capital).append("|").append(spellBook.get_spellPts()).append("|");
         }
         str.append(_align).append("~");
         str.append(_align).append(",");// fake alineacion, si son diferentes se activa haveFakeAlignment
@@ -3178,7 +2832,7 @@ public class Player {
             case 30:
             case 40:
             case 50:
-                boostSpellIncarnation();
+                spellBook.boostSpellIncarnation();
                 break;
         }
 
@@ -5618,11 +5272,11 @@ public class Player {
             this.addCapital((this.getLevel() - 1) * 5 - this.get_capital());
             this.getStatsParcho().getEffects().clear();
             // Spell reset and init
-            _sorts.clear();
+            spellBook._sorts.clear();
 
             for (int spellID : classe.getStartSorts()) {
-                char c = getNextFreeSortPlace();
-                learnSpell(spellID, 1, c);
+                char c = spellBook.getNextFreeSortPlace();
+                spellBook.learnSpell(spellID, 1, c);
             }
             //this._sortsPlaces = Constant.getStartSortsPlaces(classeID);
             this.level = 1;
@@ -6428,18 +6082,18 @@ public class Player {
 
     //region Objects class
     public Map<Integer, HashMap<Integer, Integer>> getObjectsClassSpell() {
-        return objectsClassSpell;
+        return spellBook.objectsClassSpell;
     }
 
     public void addObjectClassSpell(int spell, int effect, int value) {
-        if (!objectsClassSpell.containsKey(spell)) {
+        if (!spellBook.objectsClassSpell.containsKey(spell)) {
             HashMap<Integer, Integer> newMap = new HashMap<>();
             newMap.put(effect, value);
-            objectsClassSpell.put(spell, newMap);
+            spellBook.objectsClassSpell.put(spell, newMap);
         }
         else
         {
-            HashMap<Integer, Integer> map = objectsClassSpell.get(spell);
+            HashMap<Integer, Integer> map = spellBook.objectsClassSpell.get(spell);
             if(map.containsKey(effect))
             {
                 int newValue = map.get(effect) + value;
@@ -6450,14 +6104,14 @@ public class Player {
             {
                 map.put(effect, value);
             }
-            objectsClassSpell.remove(spell);
-            objectsClassSpell.put(spell, map);
+            spellBook.objectsClassSpell.remove(spell);
+            spellBook.objectsClassSpell.put(spell, map);
         }
     }
 
     public void removeObjectClassSpell(int spell) {
-        if (objectsClassSpell.containsKey(spell)) {
-            objectsClassSpell.remove(spell);
+        if (spellBook.objectsClassSpell.containsKey(spell)) {
+            spellBook.objectsClassSpell.remove(spell);
         }
     }
 
@@ -6486,9 +6140,9 @@ public class Player {
 
     public int getValueOfClassObject(int spell, int effect) {
         int modif = 0;
-        if (objectsClassSpell.containsKey(spell)) {
-            if (objectsClassSpell.get(spell).containsKey(effect)) {
-                return objectsClassSpell.get(spell).get(effect);
+        if (spellBook.objectsClassSpell.containsKey(spell)) {
+            if (spellBook.objectsClassSpell.get(spell).containsKey(effect)) {
+                return spellBook.objectsClassSpell.get(spell).get(effect);
             }
         }
         return modif;
@@ -6971,7 +6625,7 @@ public class Player {
             return false;
         }
 
-        for (SpellGrade sort : this._sorts.values() ) {
+        for (SpellGrade sort : this.spellBook._sorts.values() ) {
             int point = 0;
             switch (sort.getLevel()){
                 case 1:
@@ -6995,7 +6649,7 @@ public class Player {
                     point = 0;
                     break;
             }
-            this.set_spellPts(this.get_spellPts() + point);
+            spellBook.set_spellPts(spellBook.get_spellPts() + point);
         }
 
         this.setClasseID(clase);
@@ -7003,16 +6657,16 @@ public class Player {
         SocketManager.GAME_SEND_AC_CHANGE_CLASSE(this, getClasseID());
 
         // Spell reset and init
-        _sorts.clear();
-        _sortsPlaces.clear();
+        spellBook._sorts.clear();
+        spellBook._sortsPlaces.clear();
 
         for (int spellID : classe.getStartSorts()) {
-            char c = getNextFreeSortPlace();
-            learnSpell(spellID, 1, c);
+            char c = spellBook.getNextFreeSortPlace();
+            spellBook.learnSpell(spellID, 1, c);
         }
 
         for (int a = 1; a <= this.getLevel(); a++) {
-            checkAndLearnSpell(a);
+            spellBook.checkAndLearnSpell(a);
         }
 
         if(isOnline)
@@ -7077,7 +6731,7 @@ public class Player {
 
     public String stringListeSorts() {
         final StringBuilder str = new StringBuilder();
-        for (SpellGrade hp : _sorts.values()) {
+        for (SpellGrade hp : spellBook._sorts.values()) {
             if (hp.getSpell() == null) {
                 continue;
             }
@@ -7085,7 +6739,7 @@ public class Player {
                 str.append(";");
             }
 
-            str.append(hp.getSpellID()).append("~").append(hp.getLevel()).append("~").append(_sortsPlaces.get(hp.getSpellID()));
+            str.append(hp.getSpellID()).append("~").append(hp.getLevel()).append("~").append(spellBook._sortsPlaces.get(hp.getSpellID()));
         }
         return str.toString();
     }
@@ -7444,21 +7098,21 @@ public class Player {
     }
 
     public void removeItemClasseSpell(int spell) {
-        if (objectsClassSpell.containsKey(spell)) {
-            objectsClassSpell.remove(spell);
+        if (spellBook.objectsClassSpell.containsKey(spell)) {
+            spellBook.objectsClassSpell.remove(spell);
         }
     }
 
     public void refreshItemClasseSpell(int spell, int effect, int modif) {
-        if (!objectsClassSpell.containsKey(spell)) {
+        if (!spellBook.objectsClassSpell.containsKey(spell)) {
             //objectsClassSpell.put(spell, new World.Couple<Integer, Integer>(effect, modif));
             HashMap<Integer, Integer> newMap = new HashMap<>();
             newMap.put(effect, modif);
-            objectsClassSpell.put(spell, newMap);
+            spellBook.objectsClassSpell.put(spell, newMap);
         }
         else
         {
-            HashMap<Integer, Integer> map = objectsClassSpell.get(spell);
+            HashMap<Integer, Integer> map = spellBook.objectsClassSpell.get(spell);
             if(map.containsKey(effect))
             {
                 //int newValue = map.get(effect) + modif;
@@ -7471,21 +7125,21 @@ public class Player {
                 map.put(effect, modif);
             }
 
-            objectsClassSpell.remove(spell);
-            objectsClassSpell.put(spell, map);
+            spellBook.objectsClassSpell.remove(spell);
+            spellBook.objectsClassSpell.put(spell, map);
         }
     }
 
     public void addItemClasseSpell(int spell, int effect, int modif) {
-        if (!objectsClassSpell.containsKey(spell)) {
+        if (!spellBook.objectsClassSpell.containsKey(spell)) {
             //objectsClassSpell.put(spell, new World.Couple<Integer, Integer>(effect, modif));
             HashMap<Integer, Integer> newMap = new HashMap<>();
             newMap.put(effect, modif);
-            objectsClassSpell.put(spell, newMap);
+            spellBook.objectsClassSpell.put(spell, newMap);
         }
         else
         {
-            HashMap<Integer, Integer> map = objectsClassSpell.get(spell);
+            HashMap<Integer, Integer> map = spellBook.objectsClassSpell.get(spell);
             if(map.containsKey(effect))
             {
                 int newValue = map.get(effect) + modif;
@@ -7497,8 +7151,8 @@ public class Player {
                 map.put(effect, modif);
             }
 
-            objectsClassSpell.remove(spell);
-            objectsClassSpell.put(spell, map);
+            spellBook.objectsClassSpell.remove(spell);
+            spellBook.objectsClassSpell.put(spell, map);
         }
     }
 

@@ -1374,7 +1374,7 @@ public class GameClient {
                         break;
                     case 's' :
                         int id = Integer.parseInt(packet.substring(3));
-                        if (player.NerfSpell(id))
+                        if (player.spellBook.NerfSpell(id))
                         {
                             SocketManager.GAME_SEND_MESSAGE(player, "Votre sort à bien descendu d'un niveau et vos points de sort rendu.", "2997F1");
                             break;
@@ -6034,7 +6034,7 @@ public class GameClient {
 
             if(this.player.getCurrentCompagnon() == null) {
                 if (fight != null) {
-                    SpellGrade SS = this.player.getSortStatBySortIfHas(id);
+                    SpellGrade SS = this.player.spellBook.getSortStatBySortIfHas(id);
                     if (SS != null){
                         this.player.getFight().cast(this.player.getFight().getFighterByPerso(this.player), () -> this.player.getFight().tryCastSpell(this.player.getFight().getFighterByPerso(this.player), SS, cellId));
                     }
@@ -6048,7 +6048,7 @@ public class GameClient {
             else {
                 Player player = this.player.getCurrentCompagnon().getPlayer();
                 if (fight != null) {
-                    SpellGrade SS = player.getSortStatBySortIfHas(id);
+                    SpellGrade SS = player.spellBook.getSortStatBySortIfHas(id);
                     if (SS != null) {
                         if (!player.getFight().getCurAction().isEmpty()) {
                             getDate();
@@ -8957,8 +8957,8 @@ public class GameClient {
     private void boostSpell(String packet) {
         try {
             int id = Integer.parseInt(packet.substring(2));
-            if (this.player.boostSpell(id)) {
-                SocketManager.GAME_SEND_SPELL_UPGRADE_SUCCED(this, id, this.player.getSortStatBySortIfHas(id).getLevel());
+            if (this.player.spellBook.boostSpell(id)) {
+                SocketManager.GAME_SEND_SPELL_UPGRADE_SUCCED(this, id, this.player.spellBook.getSortStatBySortIfHas(id).getLevel());
                 SocketManager.GAME_SEND_STATS_PACKET(this.player);
             } else {
                 SocketManager.GAME_SEND_SPELL_UPGRADE_FAILED(this);
@@ -8975,8 +8975,9 @@ public class GameClient {
         int id = Integer.parseInt(packet.substring(2));
         if(id == -1)
             this.player.setExchangeAction(null);
-        if (this.player.forgetSpell(id)) {
-            SocketManager.GAME_SEND_SPELL_UPGRADE_SUCCED(this, id, this.player.getSortStatBySortIfHas(id).getLevel());
+
+        if (this.player.spellBook.forgetSpell(id)) {
+            SocketManager.GAME_SEND_SPELL_UPGRADE_SUCCED(this, id, this.player.spellBook.getSortStatBySortIfHas(id).getLevel());
             SocketManager.GAME_SEND_STATS_PACKET(this.player);
             this.player.setExchangeAction(null);
         }
@@ -8986,9 +8987,10 @@ public class GameClient {
         try {
             int SpellID = Integer.parseInt(packet.substring(2).split("\\|")[0]);
             int Position = Integer.parseInt(packet.substring(2).split("\\|")[1]);
-            SpellGrade Spell = this.player.getSortStatBySortIfHas(SpellID);
+            SpellGrade Spell = this.player.spellBook.getSortStatBySortIfHas(SpellID);
             if (Spell != null) {
-                this.player.set_SpellPlace(SpellID, World.world.getCryptManager().getHashedValueByInt(Position));
+                char place = World.world.getCryptManager().getHashedValueByInt(Position);
+                this.player.spellBook.set_SpellPlace(SpellID, place);
             }
             SocketManager.GAME_SEND_BN(this);
         } catch (Exception e) {

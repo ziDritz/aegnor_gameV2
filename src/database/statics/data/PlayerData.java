@@ -229,7 +229,7 @@ public class PlayerData extends AbstractDAO<Player> {
             p.setInt(6, perso.getColor2());
             p.setInt(7, perso.getColor3());
             p.setLong(8, perso.getKamas());
-            p.setInt(9, perso.get_spellPts());
+            p.setInt(9, perso.spellBook.get_spellPts());
             p.setInt(10, perso.get_capital());
             p.setInt(11, perso.getEnergy());
             p.setInt(12, perso.getLevel());
@@ -239,7 +239,8 @@ public class PlayerData extends AbstractDAO<Player> {
             p.setInt(16, perso.getAccID());
             p.setInt(17, perso.getCurCell().getId());
             p.setInt(18, perso.getCurMap().getId());
-            p.setString(19, perso.parseSpellToDB());
+
+            p.setString(19, perso.spellBook.parseSpellToDB());
             p.setInt(20, Config.INSTANCE.getSERVER_ID());
             executeUpdate(p);
             return true;
@@ -288,7 +289,7 @@ public class PlayerData extends AbstractDAO<Player> {
         String query = "UPDATE `players` SET `kamas`= ?, `spellboost`= ?, `capital`= ?, `energy`= ?, `level`= ?, `xp`= ?, `size` = ?, `gfx`= ?, `alignement`= ?, `honor`= ?, `deshonor`= ?, `alvl`= ?, `vitalite`= ?, `force`= ?, `sagesse`= ?, `intelligence`= ?, `chance`= ?, `agilite`= ?, `seeFriend`= ?, `seeAlign`= ?, `seeSeller`= ?, `canaux`= ?, `map`= ?, `cell`= ?, `pdvper`= ?, `spells`= ?, `objets`= ?, `storeObjets`= ?, `savepos`= ?, `zaaps`= ?, `jobs`= ?, `mountxpgive`= ?, `mount`= ?, `title`= ?, `wife`= ?, `morphMode`= ?, `allTitle` = ?, `emotes` = ?, `prison` = ?, `parcho` = ?, `timeDeblo` = ?, `noall` = ?, `deadInformation` = ?, `needRestat` = ?, `totalKills` = ?, `isParcho` = ? WHERE `players`.`id` = ? LIMIT 1";
         try (Connection conn = dataSource.getConnection() ; PreparedStatement p = conn.prepareStatement(query) ) {
             p.setLong(1, player.getKamas());
-            p.setInt(2, player.get_spellPts());
+            p.setInt(2, player.spellBook.get_spellPts());
             p.setInt(3, player.get_capital());
             p.setInt(4, player.getEnergy());
             p.setInt(5, player.getLevel());
@@ -318,7 +319,8 @@ public class PlayerData extends AbstractDAO<Player> {
             else
                 p.setInt(24, 311);
             p.setInt(25, player.get_pdvper());
-            p.setString(26, player.parseSpellToDB());
+
+            p.setString(26, player.spellBook.parseSpellToDB());
             p.setString(27, player.parseObjetsToDB());
             p.setString(28, player.parseStoreItemstoBD());
             p.setString(29, player.getSavePosition());
@@ -374,7 +376,8 @@ public class PlayerData extends AbstractDAO<Player> {
             p.setString(1, perso.getName());
             p.setInt(2, perso.getSexe());
             p.setInt(3, perso.getClasseID());
-            p.setString(4, perso.parseSpellToDB());
+
+            p.setString(4, perso.spellBook.parseSpellToDB());
             p.setInt(5, perso.getId());
             executeUpdate(p);
         } catch (SQLException e) {

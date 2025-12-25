@@ -313,7 +313,7 @@ public class DiscordBot extends ListenerAdapter {
                         mess += "**Kamas sur Banque**  : " + look.getBankKamas() + "\n";
                         mess += "**Points boutiques**  : " + look.getAccount().getWebAccount().getPoints() + "\n";
                         mess += "**Guilde**  : " + look.getGuild().getName() + "\n";
-                        mess += "**Capital & Points de sorts**  : " + look.get_capital() + " - "+look.get_spellPts()+"\n";
+                        mess += "**Capital & Points de sorts**  : " + look.get_capital() + " - "+ look.spellBook.get_spellPts() +"\n";
                     } else {
                         mess = "Aucun personnage n'a été trouvé avec ce nom !";
                     }

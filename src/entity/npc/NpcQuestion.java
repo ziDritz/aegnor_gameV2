@@ -267,7 +267,7 @@ public class NpcQuestion {
                             case 2754:
                                 if (player.getCurMap().getId() != (short) 9717)
                                     ok = false;
-                                else if (player.hasSpell(414))
+                                else if (player.spellBook.hasSpell(414))
                                     ok = false;
                                 else if (!player.hasItemTemplate(7904, 50)
                                         || !player.hasItemTemplate(7903, 50))
@@ -430,7 +430,8 @@ public class NpcQuestion {
                                 if (curMap.getId() == (short) idMap) // Si on est dans le temple de notre classe
                                 {
                                     // si on a le doplon de classe
-                                    ok = player.hasItemTemplate(Dopeul.getDoplonByClasse(player.getClasseID()), 1) && !player.hasSpell(Constant.getSpecialSpellByClasse(player.getClasseID()));
+                                    int spellID = Constant.getSpecialSpellByClasse(player.getClasseID());
+                                    ok = player.hasItemTemplate(Dopeul.getDoplonByClasse(player.getClasseID()), 1) && !player.spellBook.hasSpell(spellID);
                                 } else
                                     ok = false;
                                 break; // Faire sur l'action id

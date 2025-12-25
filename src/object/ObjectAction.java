@@ -350,8 +350,9 @@ public class ObjectAction {
                                     }
                                     break;
                                 case 7://Point de Sort.
-                                    player.set_spellPts(player.get_spellPts()
-                                            + val);
+                                    int pts = player.spellBook.get_spellPts()
+                                            + val;
+                                    player.spellBook.set_spellPts(pts);
                                     break;
                             }
                         }
@@ -374,7 +375,8 @@ public class ObjectAction {
                         id0 = Integer.parseInt(arg);
                         if (World.world.getSort(id0) == null)
                             return;
-                        if (!player.learnSpell(id0, 1, true, true, true))
+
+                        if (!player.spellBook.learnSpell(id0, 1, true, true, true))
                             return;
                         send = false;
                         break;
@@ -382,12 +384,13 @@ public class ObjectAction {
                     case 7://D�sapprendre un sort.
                         if (player0.getFight() != null) return;
                         id0 = Integer.parseInt(arg);
-                        int oldLevel = player.getSortStatBySortIfHas(id0).getLevel();
-                        if (player.getSortStatBySortIfHas(id0) == null)
+                        int oldLevel = player.spellBook.getSortStatBySortIfHas(id0).getLevel();
+                        if (player.spellBook.getSortStatBySortIfHas(id0) == null)
                             return;
                         if (oldLevel <= 1)
                             return;
-                        player.unlearnSpell(player, id0, 1, oldLevel, true, true);
+
+                        player.spellBook.unlearnSpell(player, id0, 1, oldLevel, true, true);
                         break;
 
                     case 8://D�sapprendre un sort � un percepteur.

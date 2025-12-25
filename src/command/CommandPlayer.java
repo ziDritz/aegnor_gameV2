@@ -1076,7 +1076,8 @@ public class CommandPlayer {
                     return true;
                 }
                 else{
-                    player.set_spellPts(player.get_spellPts() + 15);
+                    int pts = player.spellBook.get_spellPts() + 15;
+                    player.spellBook.set_spellPts(pts);
                     SocketManager.GAME_SEND_STATS_PACKET(player);
                     if(Config.INSTANCE.getAZURIOM()) {
                         player.getAccount().getWebAccount().setPoints(points - prix);

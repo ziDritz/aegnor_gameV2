@@ -1397,13 +1397,13 @@ public class Fight {
 
                     player.setOldPosition();
 
-                    if (player.hasSpell(367))
+                    if (player.spellBook.hasSpell(367))
                         hasCawotte = true;
-                    if (player.hasSpell(373))
+                    if (player.spellBook.hasSpell(373))
                         hasChafer = true;
-                    if (player.hasSpell(101))
+                    if (player.spellBook.hasSpell(101))
                         hasRoulette = true;
-                    if (player.hasSpell(370))
+                    if (player.spellBook.hasSpell(370))
                         hasArakne = true;
                     if (player.getSexe() == 0)
                         hasMale = true;

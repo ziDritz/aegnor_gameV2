@@ -1005,7 +1005,7 @@ public class Fighter implements Comparable<Fighter> {
 
     public void initBuffStats() {
         if (this.type == 1)
-            this.fightBuffs.addAll(this.perso.get_buff().values().stream().collect(Collectors.toList()));
+            this.fightBuffs.addAll(this.perso.spellBook.get_buff().values().stream().collect(Collectors.toList()));
     }
 
     public void applyBeginningTurnBuff(Fight fight) {
@@ -1217,7 +1217,8 @@ public class Fighter implements Comparable<Fighter> {
     }
 
     public boolean canLaunchSpell(int spellID) {
-        return this.getPlayer().hasSpell(spellID) && LaunchedSpell.cooldownGood(this, spellID);
+        Player player = this.getPlayer();
+        return player.spellBook.hasSpell(spellID) && LaunchedSpell.cooldownGood(this, spellID);
     }
 
     public void unHide(int spellid) {

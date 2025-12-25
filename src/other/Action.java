@@ -245,7 +245,8 @@ public class Action {
                     int sID = Integer.parseInt(args);
                     if (World.world.getSort(sID) == null)
                         return true;
-                    player.learnSpell(sID, 1, true, true, true);
+
+                    player.spellBook.learnSpell(sID, 1, true, true, true);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -752,7 +753,8 @@ public class Action {
                         return true;
                     if (player.getCurMap().getId() != mapId)
                         return true;
-                    player.learnSpell(sID, 1, true, true, true);
+
+                    player.spellBook.learnSpell(sID, 1, true, true, true);
                 } catch (Exception e) {
                     e.printStackTrace();
                     GameServer.a(e.getMessage());
@@ -1036,7 +1038,7 @@ public class Action {
                     int pts = Integer.parseInt(args);
                     if (pts < 1)
                         return true;
-                    player.addSpellPoint(pts);
+                    player.spellBook.addSpellPoint(pts);
                     SocketManager.GAME_SEND_STATS_PACKET(player);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -1153,12 +1155,13 @@ public class Action {
             case 28://Desapprendre un sort
                 try {
                     int sID = Integer.parseInt(args);
-                    int AncLevel = player.getSortStatBySortIfHas(sID).getLevel();
-                    if (player.getSortStatBySortIfHas(sID) == null)
+                    int AncLevel = player.spellBook.getSortStatBySortIfHas(sID).getLevel();
+                    if (player.spellBook.getSortStatBySortIfHas(sID) == null)
                         return true;
                     if (AncLevel <= 1)
                         return true;
-                    player.unlearnSpell(player, sID, 1, AncLevel, true, true);
+
+                    player.spellBook.unlearnSpell(player, sID, 1, AncLevel, true, true);
                 } catch (Exception e) {
                     e.printStackTrace();
                     GameServer.a(e.getMessage());
@@ -1174,12 +1177,13 @@ public class Action {
                     if (pNewKamas3 < 0)
                         pNewKamas3 = 0;
                     int sID = Integer.parseInt(args);
-                    int AncLevel = player.getSortStatBySortIfHas(sID).getLevel();
-                    if (player.getSortStatBySortIfHas(sID) == null)
+                    int AncLevel = player.spellBook.getSortStatBySortIfHas(sID).getLevel();
+                    if (player.spellBook.getSortStatBySortIfHas(sID) == null)
                         return true;
                     if (AncLevel <= 1)
                         return true;
-                    player.unlearnSpell(player, sID, 1, AncLevel, true, true);
+
+                    player.spellBook.unlearnSpell(player, sID, 1, AncLevel, true, true);
                     SocketManager.GAME_SEND_MESSAGE(player, "Tu as perdu "
                             + payKamas + "Kamas.");
                 } else {
@@ -2374,7 +2378,8 @@ public class Action {
                     player.removeByTemplateID(973, 1);
                     SocketManager.GAME_SEND_Im_PACKET(player, "022;" + 1 + "~"
                             + 973);
-                    player.learnSpell(370, 1, true, true, true);
+
+                    player.spellBook.learnSpell(370, 1, true, true, true);
                 }
                 break;
 
@@ -2769,7 +2774,8 @@ public class Action {
                             && player.hasItemTemplate(7903, 50)) {
                         player.removeByTemplateID(7904, 50);
                         player.removeByTemplateID(7903, 50);
-                        player.learnSpell(414, 1, true, true, true);
+
+                        player.spellBook.learnSpell(414, 1, true, true, true);
                     }
                 }
                 break;
@@ -3193,7 +3199,8 @@ public class Action {
                 if (player.hasItemTemplate(361, 100)) {
                     player.removeByTemplateID(361, 100);
                     player.send("Im022;100~361");
-                    player.learnSpell(367, 1, true, true, true);
+
+                    player.spellBook.learnSpell(367, 1, true, true, true);
 
                     NpcQuestion quest = World.world.getNPCQuestion(473);
                     if (quest == null) {
@@ -3719,7 +3726,7 @@ public class Action {
                     return true;
                 if (!player.hasItemTemplate(8064, 10))
                     return true;
-                if (player.hasSpell(364))
+                if (player.spellBook.hasSpell(364))
                     return true;
 
                 SocketManager.GAME_SEND_Im_PACKET(player, "022;" + 10 + "~"
@@ -3735,7 +3742,7 @@ public class Action {
                         + 8064);
                 player.removeByTemplateID(8064, 10);
 
-                player.learnSpell(364, 1, true, true, true);
+                player.spellBook.learnSpell(364, 1, true, true, true);
                 break;
 
             case 975://Entr�e salle skeunk
