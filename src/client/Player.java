@@ -29,6 +29,7 @@ import fight.arena.DeathMatch;
 import fight.arena.TeamMatch;
 import fight.spells.Effect;
 import fight.spells.EffectConstant;
+import fight.spells.SpellBook;
 import fight.spells.SpellGrade;
 import game.GameClient;
 import game.GameServer;
@@ -88,6 +89,17 @@ public class Player {
     public boolean isXpOffilike = false;
     
     private PlayerWallet wallet;
+    // SpellBook
+    private SpellBook spellBook;
+    private int _spellPts;
+    private Map<Integer, SpellGrade> _sorts = new HashMap<Integer, SpellGrade>();
+    private Map<Integer, Character> _sortsPlaces = new HashMap<Integer, Character>();
+    private Map<Integer, HashMap<Integer, Integer>> objectsClassSpell = new HashMap<>();
+    private Map<Integer, SpellGrade> _saveSorts = new HashMap<Integer, SpellGrade>();
+    private Map<Integer, Character> _saveSortsPlaces = new HashMap<Integer, Character>();
+    private int _saveSpellPts;
+    private Map<Integer, Effect> buffs = new HashMap<Integer, Effect>();
+    // private int pa = 0;
     //Job
     private JobAction _curJobAction;
     //Disponibilit�
@@ -107,17 +119,16 @@ public class Player {
     private String name;
     private int sexe;
     private int classeID;
-    private Classe classe;
+    public Classe classe;
     private int color1;
     private int color2;
     private int color3;
-    private int level;
+    public int level;
     private int energy;
     private long exp;
     private int curPdv;
     private int maxPdv;
     private Stats statsParcho = new Stats(true);
-    private int _spellPts;
     private int _capital;
     private int _size;
     private int gfxId;
@@ -138,14 +149,13 @@ public class Player {
     private boolean _showFriendConnection;
     private String _canaux;
     private Fight fight;
-    private boolean away;
+    public boolean away;
     private GameMap curMap;
     private GameCase curCell;
     private boolean ready = false;
     private boolean isOnline = false;
     private Party party;
     private int duelId = -1;
-    private Map<Integer, Effect> buffs = new HashMap<Integer, Effect>();
     private Map<Long, GameObject> objects = new HashMap<>();
     private String _savePos;
     private int _emoteActive = 0;
@@ -163,9 +173,6 @@ public class Player {
     private boolean _onMount = false;
     //Zaap
     private ArrayList<Short> _zaaps = new ArrayList<Short>();
-    //Sort
-    private Map<Integer, SpellGrade> _sorts = new HashMap<Integer, SpellGrade>();
-    private Map<Integer, Character> _sortsPlaces = new HashMap<Integer, Character>();
     //Titre
     private byte _title = 0;
     //Mariage
@@ -187,7 +194,6 @@ public class Player {
     private Monster.MobGroup hasMobGroup = null;
     //Item classe
 
-    private Map<Integer, HashMap<Integer, Integer>> objectsClassSpell = new HashMap<>();
     private int _bendHechizo = 0;
     private int _bendEfecto = 0;
     private int _bendModif = 0;
@@ -203,11 +209,8 @@ public class Player {
     private Stalk _traqued;
     private boolean doAction;
     //FullMorph Stats
-    private boolean _morphMode = false;
+    public boolean _morphMode = false;
     private int _morphId;
-    private Map<Integer, SpellGrade> _saveSorts = new HashMap<Integer, SpellGrade>();
-    private Map<Integer, Character> _saveSortsPlaces = new HashMap<Integer, Character>();
-    private int _saveSpellPts;
     private int pa = 0,
             pm = 0,
             vitalite = 0,
@@ -1237,42 +1240,51 @@ public class Player {
         Database.getStatics().getPlayerData().updateTitles(this.getId(), _allTitle);
     }
 
-    public void setSpells(Map<Integer, SpellGrade> spells) {
+    private void parseSpellsFullMorph(String str) {
+        String[] spells = str.split(",");
         _sorts.clear();
         _sortsPlaces.clear();
-        _sorts = spells;
-        _sortsPlaces = Constant.getStartSortsPlaces(this.getClasseID());
+        for (String e : spells) {
+            try {
+                int id = Integer.parseInt(e.split(";")[0]);
+                int lvl = Integer.parseInt(e.split(";")[1]);
+                char place = e.split(";")[2].charAt(0);
+
+                if (!_morphMode)
+                    learnSpell(id, lvl, false, false, false);
+                else
+                    learnSpell(id, lvl, false, true, false);
+                _sortsPlaces.put(id, place);
+            } catch (NumberFormatException e1) {
+                e1.printStackTrace();
+            }
+        }
     }
 
-    public void teleportOldMap() {
-        this.teleport(oldMap, oldCell);
+    private void parseSpellsFullMorphGladia(String str) {
+        String[] spells = str.split(",");
+        _sorts.clear();
+        _sortsPlaces.clear();
+        for (String e : spells) {
+            try {
+                int id = Integer.parseInt(e.split(";")[0]);
+                int lvl = Integer.parseInt(e.split(";")[1]);
+                int placeid = Integer.parseInt(e.split(";")[2],16);
+
+                char place = Constant.SPELL_PLACES.get(placeid);
+
+                learnSpell(id, lvl, false, false, false);
+
+                _sortsPlaces.put(id, place);
+            } catch (NumberFormatException e1) {
+                e1.printStackTrace();
+            }
+        }
+        SocketManager.GAME_SEND_SPELL_LIST(this);
     }
 
-    public void setCurrentPositionToOldPosition() {
-        this.curMap = World.world.getMap(this.oldMap);
-        this.curCell = this.curMap.getCase(this.oldCell);
-    }
+    // SpellBook
 
-    public void setOldPosition() {
-        this.oldMap = this.getCurMap().getId();
-        this.oldCell = this.getCurCell().getId();
-    }
-
-    public void setOnline(boolean isOnline) {
-        this.isOnline = isOnline;
-    }
-
-    public boolean isOnline() {
-        return isOnline;
-    }
-
-    public Party getParty() {
-        return party;
-    }
-
-    public void setParty(Party party) {
-        this.party = party;
-    }
 
     public String parseSpellToDB() {
         StringBuilder sorts = new StringBuilder();
@@ -1350,68 +1362,8 @@ public class Player {
         }
     }
 
-    private void parseSpellsFullMorph(String str) {
-        String[] spells = str.split(",");
-        _sorts.clear();
-        _sortsPlaces.clear();
-        for (String e : spells) {
-            try {
-                int id = Integer.parseInt(e.split(";")[0]);
-                int lvl = Integer.parseInt(e.split(";")[1]);
-                char place = e.split(";")[2].charAt(0);
-
-                if (!_morphMode)
-                    learnSpell(id, lvl, false, false, false);
-                else
-                    learnSpell(id, lvl, false, true, false);
-                _sortsPlaces.put(id, place);
-            } catch (NumberFormatException e1) {
-                e1.printStackTrace();
-            }
-        }
-    }
-
-    private void parseSpellsFullMorphGladia(String str) {
-        String[] spells = str.split(",");
-        _sorts.clear();
-        _sortsPlaces.clear();
-        for (String e : spells) {
-            try {
-                int id = Integer.parseInt(e.split(";")[0]);
-                int lvl = Integer.parseInt(e.split(";")[1]);
-                int placeid = Integer.parseInt(e.split(";")[2],16);
-
-                char place = Constant.SPELL_PLACES.get(placeid);
-
-                learnSpell(id, lvl, false, false, false);
-
-                _sortsPlaces.put(id, place);
-            } catch (NumberFormatException e1) {
-                e1.printStackTrace();
-            }
-        }
-        SocketManager.GAME_SEND_SPELL_LIST(this);
-    }
-
-
-    public String getSavePosition() {
-        return _savePos;
-    }
-
-    public void set_savePos(String savePos) {
-        _savePos = savePos;
-    }
-
     public Map<Integer, Effect> get_buff() {
         return buffs;
-    }
-
-    public Account getAccount() {
-        return account;
-    }
-
-    public void setAccount(Account c) {
-        account = c;
     }
 
     public int get_spellPts() {
@@ -1428,140 +1380,6 @@ public class Player {
             _spellPts = pts;
     }
 
-    public Guild getGuild() {
-        if (_guildMember == null)
-            return null;
-        return _guildMember.getGuild();
-    }
-
-    public void setChangeName(boolean changeName) {
-        this.changeName = changeName;
-        if (changeName) this.send("AlEr");
-    }
-
-    public boolean isChangeName() {
-        return changeName;
-    }
-
-    public boolean isReady() {
-        return ready;
-    }
-
-    public void setReady(boolean ready) {
-        this.ready = ready;
-    }
-
-    public int getDuelId() {
-        return duelId;
-    }
-
-    public void setDuelId(int _duelid) {
-        duelId = _duelid;
-    }
-
-    public Fight getFight() {
-        return fight;
-    }
-
-    public void setFight(Fight fight) {
-        refreshLife(false);
-        if (fight == null)
-            SocketManager.send(this, "ILS2000");
-        else
-            SocketManager.send(this, "ILF0");
-        this.sitted = false;
-        this.fight = fight;
-    }
-
-    public boolean is_showFriendConnection() {
-        return _showFriendConnection;
-    }
-
-    public boolean is_showWings() {
-        return _showWings;
-    }
-
-    public boolean isShowSeller() {
-        return _seeSeller;
-    }
-
-    public void setShowSeller(boolean is) {
-        _seeSeller = is;
-    }
-
-    public String get_canaux() {
-        return _canaux;
-    }
-
-    public GameCase getCurCell() {
-        return curCell;
-    }
-
-    public void setCurCell(GameCase cell) {
-        curCell = cell;
-    }
-
-    public int get_size() {
-        return _size;
-    }
-
-    public void set_size(int _size) {
-        this._size = _size;
-    }
-
-    public int getGfxId() {
-        return gfxId;
-    }
-
-    public void setGfxId(int _gfxid) {
-        if (this.getClasseID() * 10 + this.getSexe() != _gfxid) {
-            if (this.isOnMount())
-                this.toogleOnMount();
-            this.send("AR3K");
-        } else {
-            this.send("AR6bK");
-        }
-        gfxId = _gfxid;
-    }
-
-    public boolean isMorphMercenaire() {
-        return (this.gfxId == 8009 || this.gfxId == 8006);
-    }
-
-    public GameMap getCurMap() {
-        return curMap;
-    }
-
-    public void setCurMap(GameMap curMap) {
-        this.curMap = curMap;
-    }
-
-    public boolean isAway() {
-        return away;
-    }
-
-    public void setAway(boolean away) {
-        this.away = away;
-    }
-
-    public boolean isSitted() {
-        return sitted;
-    }
-
-    public void setSitted(boolean sitted) {
-        if (this.sitted == sitted) {
-            return;
-        }
-        this.sitted = sitted;
-        refreshLife(false);
-        regenRate = (sitted ? 250 : 500);
-        SocketManager.send(this, "ILS" + regenRate);
-    }
-
-    public int get_capital() {
-        return _capital;
-    }
-
     public void setSpellsPlace(boolean ok) {
         if (ok)
             _sortsPlaces = Constant.getStartSortsPlaces(this.getClasseID());
@@ -1569,7 +1387,6 @@ public class Player {
             _sortsPlaces.clear();
         SocketManager.GAME_SEND_SPELL_LIST(this);
     }
-
 
     /**
      * @return next free sort place, or '\0' if none is available
@@ -1589,7 +1406,6 @@ public class Player {
         }
         return '\0';
     }
-
 
     public void learnSpell(int spell, int level, char pos) {
         if (World.world.getSort(spell).getStatsByLevel(level) == null) {
@@ -1738,6 +1554,249 @@ public class Player {
         } else {
             return false;
         }
+    }
+
+    public void set_SpellPlace(int SpellID, char Place) {
+        replace_SpellInBook(Place);
+        _sortsPlaces.remove(SpellID);
+        _sortsPlaces.put(SpellID, Place);
+        Database.getStatics().getPlayerData().update(this);
+    }
+
+    private void replace_SpellInBook(char Place) {
+        for (int key : _sorts.keySet())
+            if (_sortsPlaces.get(key) != null)
+                if (_sortsPlaces.get(key).equals(Place))
+                    _sortsPlaces.remove(key);
+    }
+
+    public SpellGrade getSortStatBySortIfHas(int spellID) {
+        return _sorts.get(spellID);
+    }
+
+    public void checkAndLearnSpell() {
+        if (classe.GetSorts().containsKey(this.level)) {
+            char c = getNextFreeSortPlace();
+            learnSpell(classe.GetSorts().get(this.level), 1, c);
+        }
+    }
+
+    public void checkAndLearnSpell(int level) {
+        if (classe.GetSorts().containsKey(level)) {
+            char c = getNextFreeSortPlace();
+            learnSpell(classe.GetSorts().get(level), 1, c);
+        }
+    }
+
+    public boolean NerfSpell(int spellID)
+    {
+        if(getFight() != null)
+            return false;
+        int antNivel = getSortStatBySortIfHas(spellID).getLevel();
+        if (antNivel <= 1)
+            return false;
+        if (learnSpell(spellID, (antNivel-1), true, false, false)) {
+            int total = 0;
+            for (int i = (antNivel-1); i < antNivel; i++)
+                total += i;
+            _spellPts += total;
+            Database.getStatics().getPlayerData().update(this);
+            SocketManager.GAME_SEND_STATS_PACKET(this);
+            SocketManager.GAME_SEND_SPELL_LIST(this);
+            return true;
+        }
+        return false;
+    }
+
+    public void addSpellPoint(int pts) {
+        if (_morphMode)
+            _saveSpellPts += pts;
+        else
+            _spellPts += pts;
+    }
+
+    public boolean hasSpell(int spellID) {
+        return (getSortStatBySortIfHas(spellID) != null);
+    }
+
+    public void teleportOldMap() {
+        this.teleport(oldMap, oldCell);
+    }
+
+    public void setCurrentPositionToOldPosition() {
+        this.curMap = World.world.getMap(this.oldMap);
+        this.curCell = this.curMap.getCase(this.oldCell);
+    }
+
+    public void setOldPosition() {
+        this.oldMap = this.getCurMap().getId();
+        this.oldCell = this.getCurCell().getId();
+    }
+
+    public void setOnline(boolean isOnline) {
+        this.isOnline = isOnline;
+    }
+
+    public boolean isOnline() {
+        return isOnline;
+    }
+
+    public Party getParty() {
+        return party;
+    }
+
+    public void setParty(Party party) {
+        this.party = party;
+    }
+
+    public String getSavePosition() {
+        return _savePos;
+    }
+
+    public void set_savePos(String savePos) {
+        _savePos = savePos;
+    }
+
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account c) {
+        account = c;
+    }
+
+    public Guild getGuild() {
+        if (_guildMember == null)
+            return null;
+        return _guildMember.getGuild();
+    }
+
+    public void setChangeName(boolean changeName) {
+        this.changeName = changeName;
+        if (changeName) this.send("AlEr");
+    }
+
+    public boolean isChangeName() {
+        return changeName;
+    }
+
+    public boolean isReady() {
+        return ready;
+    }
+
+    public void setReady(boolean ready) {
+        this.ready = ready;
+    }
+
+    public int getDuelId() {
+        return duelId;
+    }
+
+    public void setDuelId(int _duelid) {
+        duelId = _duelid;
+    }
+
+    public Fight getFight() {
+        return fight;
+    }
+
+    public void setFight(Fight fight) {
+        refreshLife(false);
+        if (fight == null)
+            SocketManager.send(this, "ILS2000");
+        else
+            SocketManager.send(this, "ILF0");
+        this.sitted = false;
+        this.fight = fight;
+    }
+
+    public boolean is_showFriendConnection() {
+        return _showFriendConnection;
+    }
+
+    public boolean is_showWings() {
+        return _showWings;
+    }
+
+    public boolean isShowSeller() {
+        return _seeSeller;
+    }
+
+    public void setShowSeller(boolean is) {
+        _seeSeller = is;
+    }
+
+    public String get_canaux() {
+        return _canaux;
+    }
+
+    public GameCase getCurCell() {
+        return curCell;
+    }
+
+    public void setCurCell(GameCase cell) {
+        curCell = cell;
+    }
+
+    public int get_size() {
+        return _size;
+    }
+
+    public void set_size(int _size) {
+        this._size = _size;
+    }
+
+    public int getGfxId() {
+        return gfxId;
+    }
+
+    public void setGfxId(int _gfxid) {
+        if (this.getClasseID() * 10 + this.getSexe() != _gfxid) {
+            if (this.isOnMount())
+                this.toogleOnMount();
+            this.send("AR3K");
+        } else {
+            this.send("AR6bK");
+        }
+        gfxId = _gfxid;
+    }
+
+    public boolean isMorphMercenaire() {
+        return (this.gfxId == 8009 || this.gfxId == 8006);
+    }
+
+    public GameMap getCurMap() {
+        return curMap;
+    }
+
+    public void setCurMap(GameMap curMap) {
+        this.curMap = curMap;
+    }
+
+    public boolean isAway() {
+        return away;
+    }
+
+    public void setAway(boolean away) {
+        this.away = away;
+    }
+
+    public boolean isSitted() {
+        return sitted;
+    }
+
+    public void setSitted(boolean sitted) {
+        if (this.sitted == sitted) {
+            return;
+        }
+        this.sitted = sitted;
+        refreshLife(false);
+        regenRate = (sitted ? 250 : 500);
+        SocketManager.send(this, "ILS" + regenRate);
+    }
+
+    public int get_capital() {
+        return _capital;
     }
 
     // Player Wallet
@@ -1890,10 +1949,6 @@ public class Player {
         return (this.gfxId != (this.getClasseID() * 10 + this.getSexe()));
     }
 
-    public boolean canCac() {
-        return this.useCac;
-    }
-
     public void unsetMorph() {
         this.setGfxId(this.getClasseID() * 10 + this.getSexe());
         SocketManager.GAME_SEND_ALTER_GM_PACKET(this.curMap, this);
@@ -1935,24 +1990,6 @@ public class Player {
             packet.append(SS.getSpellID()).append("~").append(SS.getLevel()).append("~").append(_sortsPlaces.get(SS.getSpellID())).append(";");
         }
         return packet.toString();
-    }
-
-    public void set_SpellPlace(int SpellID, char Place) {
-        replace_SpellInBook(Place);
-        _sortsPlaces.remove(SpellID);
-        _sortsPlaces.put(SpellID, Place);
-        Database.getStatics().getPlayerData().update(this);
-    }
-
-    private void replace_SpellInBook(char Place) {
-        for (int key : _sorts.keySet())
-            if (_sortsPlaces.get(key) != null)
-                if (_sortsPlaces.get(key).equals(Place))
-                    _sortsPlaces.remove(key);
-    }
-
-    public SpellGrade getSortStatBySortIfHas(int spellID) {
-        return _sorts.get(spellID);
     }
 
     public String parseALK() {
@@ -3070,40 +3107,6 @@ public class Player {
         return true;
     }
 
-    public void checkAndLearnSpell() {
-        if (classe.GetSorts().containsKey(this.level)) {
-            char c = getNextFreeSortPlace();
-            learnSpell(classe.GetSorts().get(this.level), 1, c);
-        }
-    }
-
-    public void checkAndLearnSpell(int level) {
-        if (classe.GetSorts().containsKey(level)) {
-            char c = getNextFreeSortPlace();
-            learnSpell(classe.GetSorts().get(level), 1, c);
-        }
-    }
-
-    public boolean NerfSpell(int spellID)
-    {
-        if(getFight() != null)
-            return false;
-        int antNivel = getSortStatBySortIfHas(spellID).getLevel();
-        if (antNivel <= 1)
-            return false;
-        if (learnSpell(spellID, (antNivel-1), true, false, false)) {
-            int total = 0;
-            for (int i = (antNivel-1); i < antNivel; i++)
-                total += i;
-            _spellPts += total;
-            Database.getStatics().getPlayerData().update(this);
-            SocketManager.GAME_SEND_STATS_PACKET(this);
-            SocketManager.GAME_SEND_SPELL_LIST(this);
-            return true;
-        }
-        return false;
-    }
-
     public String stringStats2() {
         final StringBuilder str = new StringBuilder("Ak");
         str.append(stringStatsComplement());
@@ -4085,12 +4088,7 @@ public class Player {
         }
     }
 
-    public void addSpellPoint(int pts) {
-        if (_morphMode)
-            _saveSpellPts += pts;
-        else
-            _spellPts += pts;
-    }
+
 
     public void addInBank(long guid, int qua) {
         if (qua <= 0)
@@ -5963,9 +5961,7 @@ public class Player {
         _livreArti = b;
     }
 
-    public boolean hasSpell(int spellID) {
-        return (getSortStatBySortIfHas(spellID) != null);
-    }
+
 
     public void leaveEnnemyFaction() {
         if (!isInEnnemyFaction)
@@ -7534,6 +7530,10 @@ public class Player {
                 return Obj;
         }
         return CAC;
+    }
+
+    public boolean canCac() {
+        return this.useCac;
     }
 
     public void handleInsufficientFunds(long amount) {
