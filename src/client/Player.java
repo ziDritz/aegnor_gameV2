@@ -87,7 +87,9 @@ public class Player {
     public boolean noall = false;
     public boolean isXpOffilike = false;
 
-
+    // Player Wallet
+    private long kamas;
+    private PlayerWallet wallet;
     //Job
     private JobAction _curJobAction;
     //Disponibilit�
@@ -117,7 +119,6 @@ public class Player {
     private int curPdv;
     private int maxPdv;
     private Stats statsParcho = new Stats(true);
-    private long kamas;
     private int _spellPts;
     private int _capital;
     private int _size;
@@ -316,6 +317,7 @@ public class Player {
         this.color2 = color2;
         this.color3 = color3;
         this.kamas = kamas;
+        this.wallet = new PlayerWallet(this, this.kamas);
         this._capital = _capital;
         this._align = alignement;
         this._honor = honor;
@@ -1403,29 +1405,6 @@ public class Player {
         _savePos = savePos;
     }
 
-    public long getKamas() {
-        return kamas;
-    }
-
-    public void setKamas(long l) {
-        if(l < 0) {
-            StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-            String str = "";
-            int i = 0;
-            for (StackTraceElement caller : stackTrace ) {
-                i++;
-                str += "["+ i +"] :" + "De " + caller.getMethodName() + "/" + caller.getClassName() + " && ";
-                if(i > 4)
-                    break;
-            }
-            World.sendWebhookMessage(Config.INSTANCE.getDISCORD_CHANNEL_FAILLE(),"BAN : Tentative de retrait de "+l+" kamas alors qu'il n'en n'avait que "+this.getKamas() +" : Trace" + str, this);
-            this.banAccount();
-        }
-        else{
-            this.kamas = l;
-        }
-    }
-
     public Map<Integer, Effect> get_buff() {
         return buffs;
     }
@@ -1762,6 +1741,19 @@ public class Player {
         } else {
             return false;
         }
+    }
+
+    // Player Wallet
+    public void addKamas(long l) {
+        wallet.addKamas(l);
+    }
+
+    public long getKamas() {
+        return wallet.getKamas();
+    }
+
+    public void setKamas(long kamas) {
+        wallet.setKamas(kamas);
     }
 
     public void demorph() {
@@ -2411,7 +2403,7 @@ public class Player {
         refreshLife(true);
         StringBuilder ASData = new StringBuilder();
         ASData.append("As").append(xpString(",")).append("|");
-        ASData.append(kamas).append("|").append(_capital).append("|").append(_spellPts).append("|");
+        ASData.append(getKamas()).append("|").append(_capital).append("|").append(_spellPts).append("|");
         ASData.append(_align).append("~").append(_align).append(",").append(_aLvl).append(",").append(getGrade()).append(",").append(_honor).append(",").append(_deshonor).append(",").append((_showWings ? "1" : "0")).append("|");
         int pdv = this.curPdv;
         int pdvMax = this.maxPdv;
@@ -2490,7 +2482,7 @@ public class Player {
         refreshLife(true);
         StringBuilder ASData = new StringBuilder();
         ASData.append("As").append(xpString(",")).append("|");
-        ASData.append(kamas).append("|").append(_capital).append("|").append(_spellPts).append("|");
+        ASData.append(getKamas()).append("|").append(_capital).append("|").append(_spellPts).append("|");
         ASData.append(_align).append("~").append(_align).append(",").append(_aLvl).append(",").append(getGrade()).append(",").append(_honor).append(",").append(_deshonor).append(",").append((_showWings ? "1" : "0")).append("|");
         int pdv = this.curPdv;
         int pdvMax = this.maxPdv;
@@ -2956,7 +2948,7 @@ public class Player {
             objects.get(guid).setQuantity(newQua);
             SocketManager.GAME_SEND_OBJECT_QUANTITY_PACKET(this, objects.get(guid));
         }
-        kamas = kamas + prix;
+        setKamas(getKamas() + prix);
 
         SocketManager.GAME_SEND_STATS_PACKET(this);
         SocketManager.GAME_SEND_Ow_PACKET(this);
@@ -3127,7 +3119,7 @@ public class Player {
     public String stringStatsComplement() {
         final StringBuilder str = new StringBuilder();
         str.append(stringExperience(",")).append("|");
-        str.append(kamas).append("|");
+        str.append(getKamas()).append("|");
         if (_morphMode != true) {
             str.append("0|0|");
         } else {
@@ -3253,34 +3245,6 @@ public class Player {
         if (this.getGameClient() != null)
             this.getGameClient().kick();
 
-    }
-
-    public void addKamas(long l) {
-        // Si retrait d'argent
-        if(l < 0 ){
-            // Si le joueur n'avait pas l'argent qu'il a essayer de se faire retirer : USE FAILLE BAN
-            if( ( kamas + l) < 0 ) {
-                StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-                String str = "";
-                int i = 0;
-                for (StackTraceElement caller : stackTrace ) {
-                        i++;
-                        str += "["+ i +"] :" + "De " + caller.getMethodName() + "/" + caller.getClassName() + " && ";
-                        if(i > 4)
-                            break;
-                }
-                World.sendWebhookMessage(Config.INSTANCE.getDISCORD_CHANNEL_FAILLE(),"BAN : Tentative de retrait de "+l+" kamas alors qu'il n'en n'avait que "+this.getKamas() +" : Trace" + str, this);
-                this.banAccount();
-                kamas = 0;
-            }
-            else{
-                kamas += l;
-            }
-        }
-        // Si ajout d'argent
-        else{
-            kamas += l;
-        }
     }
 
     public GameObject getSimilarItem(GameObject exGameObject) {
@@ -5094,7 +5058,7 @@ public class Player {
             return;//S'il n'a pas le zaap demand�(ne devrais pas arriver)
 
         int cost = Formulas.calculZaapCost(curMap, World.world.getMap(id));
-        if (kamas < cost || curMap == World.world.getMap(id) )
+        if (getKamas() < cost || curMap == World.world.getMap(id) )
             return; //S'il n'a pas les kamas (verif cot� client)
 
         if (cost < 0)
@@ -5126,7 +5090,7 @@ public class Player {
             return;
         if (id == 5295 && this.get_align() == 1)
             return;
-        kamas -= cost;
+        setKamas(getKamas() - cost);
         teleport(mapID, cellID);
         SocketManager.GAME_SEND_STATS_PACKET(this);//On envoie la perte de kamas
         SocketManager.GAME_SEND_WV_PACKET(this);//On ferme l'interface Zaap
@@ -5160,12 +5124,12 @@ public class Player {
         if (MapID == curMap.getId())
             costo = 0;
 
-        if (kamas < costo || costo < 0) {
+        if (getKamas() < costo || costo < 0) {
             SocketManager.GAME_SEND_MESSAGE(this, "Vous n'avez pas suffisamment de Kamas pour réaliser cette action.");
             return;
         }
 
-        kamas -= costo;
+        setKamas(getKamas() - costo);
         SocketManager.GAME_SEND_STATS_PACKET(this);
         this.teleport(MapID, celdaID);
 
@@ -5243,7 +5207,7 @@ public class Player {
                 int price = 20;
                 if (this.get_align() == 1 || this.get_align() == 2)
                     price = 10;
-                kamas -= price;
+                setKamas(getKamas() - price);
                 SocketManager.GAME_SEND_STATS_PACKET(this);
                 if ((map.getSubArea().getArea().getId() == 7 && this.getCurMap().getSubArea().getArea().getId() == 7)
                         || (map.getSubArea().getArea().getId() == 11 && this.getCurMap().getSubArea().getArea().getId() == 11)) {
@@ -5674,7 +5638,7 @@ public class Player {
         this._honor = 0;
         this._deshonor = 0;
         this._align = 0;
-        this.kamas = 0;
+        setKamas(0);
         this._metiers.clear();
         if(this._mount != null) {
             for(GameObject gameObject : this._mount.getObjects().values())
