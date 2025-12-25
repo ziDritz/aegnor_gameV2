@@ -7535,4 +7535,18 @@ public class Player {
         }
         return CAC;
     }
+
+    public void handleInsufficientFunds(long amount) {
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        String str = "";
+        int i = 0;
+        for (StackTraceElement caller : stackTrace ) {
+            i++;
+            str += "["+ i +"] :" + "De " + caller.getMethodName() + "/" + caller.getClassName() + " && ";
+            if(i > 4)
+                break;
+        }
+        World.sendWebhookMessage(Config.INSTANCE.getDISCORD_CHANNEL_FAILLE(),"BAN : Tentative de retrait de "+amount+" kamas alors qu'il n'en n'avait que "+this.getKamas() +" : Trace" + str, this);
+        this.banAccount();
+    }
 }
