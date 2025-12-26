@@ -63,208 +63,58 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 public class Player {
-    /** special fight **/
-    public TeamMatch kolizeum;
-    public DeathMatch deathMatch;
 
-    public final Restriction restriction;
-    public Stats stats;
+    // region [Category: Identity]
 
-    /** var for commands **/
-    public boolean isNew = false;
-    public boolean controleinvo = false;
-    public boolean noxp=false;
-    public byte needRestat = 0;
-    //Suiveur - Suivi
-    public Map<Integer, Player> follower = new HashMap<>();
-    public Player follow = null;
-    //Commande h�h�
-    public int thatMap = -1;
-    public int thatCell = -1;
-    public boolean walkFast = false;
-    public boolean getCases = false;
-    public boolean mpToTp = false;
-    public boolean noall = false;
-    public boolean isXpOffilike = false;
-
-
-    //Job
-    private JobAction _curJobAction;
-    //Disponibilit�
-    public boolean _isAbsent = false;
-    public boolean _isInvisible = false;
-    //Double
-    public boolean _isClone = false;
-
-    //Prison Alignement :
-    public boolean isInEnnemyFaction;
-    public long enteredOnEnnemyFaction;
-    public boolean donjon;
-
-
-    public ArrayList<Integer> thisCases = new ArrayList<>();
-    private int id;
-    private String name;
-    private int sexe;
-    private int classeID;
-    private Classe classe;
-    private int color1;
-    private int color2;
-    private int color3;
-    private int level;
-    private int energy;
-    private long exp;
-    private int curPdv;
-    private int maxPdv;
-    private Stats statsParcho = new Stats(true);
-    private long kamas;
-    private int _spellPts;
-    private int _capital;
-    private int _size;
-    private int gfxId;
-    private int _orientation = 1;
     private Account account;
-    //PDV
+    private int id;
     private int _accID;
-    private boolean canAggro = true;
-    //Emote
-    private List<Integer> emotes = new ArrayList<>();
-    //Variables d'ali
-    private byte _align = 0;
-    private int _deshonor = 0;
-    private int _honor = 0;
-    private boolean _showWings = false;
-    private int _aLvl = 0;
-    private GuildMember _guildMember;
-    private boolean _showFriendConnection;
-    private String _canaux;
-    private Fight fight;
-    private boolean away;
-    private GameMap curMap;
-    private GameCase curCell;
-    private boolean ready = false;
-    private boolean isOnline = false;
-    private Party party;
-    private int duelId = -1;
-    private Map<Integer, Effect> buffs = new HashMap<Integer, Effect>();
-    private Map<Long, GameObject> objects = new HashMap<>();
-    private String _savePos;
-    private int _emoteActive = 0;
-    private int savestat;
-    private House _curHouse;
-    //Invitation
-    private int _inviting = 0;
-    private ArrayList<Integer> craftingType = new ArrayList<>();
-    private Map<Integer, JobStat> _metiers = new HashMap<Integer, JobStat>();
-    //Enclos
-
-    //Monture
-    private Mount _mount;
-    private int _mountXpGive = 0;
-    private boolean _onMount = false;
-    //Zaap
-    private ArrayList<Short> _zaaps = new ArrayList<Short>();
-    //Sort
-    private Map<Integer, SpellGrade> _sorts = new HashMap<Integer, SpellGrade>();
-    private Map<Integer, Character> _sortsPlaces = new HashMap<Integer, Character>();
-    //Titre
-    private byte _title = 0;
-    //Mariage
-    private int wife = 0;
-    private int _isOK = 0;
-    //Fantome
-    private boolean isGhost = false;
-    private int _Speed = 0;
-    //Marchand
-    private boolean _seeSeller = false;
-    private Map<Long, Integer> _storeItems = new HashMap<>();                    //<ObjID, Prix>
-    //Metier
-    private boolean _metierPublic = false;
-    private boolean _livreArti = false;
-
-    //Fight end
-    private int hasEndFight = -1;
-    private Action endFightAction;
-    private Monster.MobGroup hasMobGroup = null;
-    //Item classe
-
-    private Map<Integer, HashMap<Integer, Integer>> objectsClassSpell = new HashMap<>();
-    private int _bendHechizo = 0;
-    private int _bendEfecto = 0;
-    private int _bendModif = 0;
-
-    // Taverne
-    private long timeTaverne = 0;
-    //GA
-    private GameAction _gameAction = null;
-    //Name
-    //Fight :
-    private boolean _spec;
-    //Traque
-    private Stalk _traqued;
-    private boolean doAction;
-    //FullMorph Stats
-    private boolean _morphMode = false;
-    private int _morphId;
-    private Map<Integer, SpellGrade> _saveSorts = new HashMap<Integer, SpellGrade>();
-    private Map<Integer, Character> _saveSortsPlaces = new HashMap<Integer, Character>();
-    private int _saveSpellPts;
-    private int pa = 0,
-            pm = 0,
-            vitalite = 0,
-            sagesse = 0,
-            terre = 0,
-            feu = 0,
-            eau = 0,
-            air = 0, initiative = 0;
-    private boolean useStats = false;
-    private boolean useCac = true;
-    private boolean useInventory = true;
-    // Other ?
-    private short oldMap = 0;
-    private int oldCell = 0;
-    private String _allTitle = null;
-    private boolean isBlocked = false;
-    private int action = -1;
-    //Regen hp
-    private boolean sitted;
-    private int regenRate = 500;
-    private long regenTime = -1;                                                //-1 veut dire que la personne ne c'est jamais connecte
-    private boolean isInPrivateArea = false;
-    public Start start;
-    private Group groupe;
-    private boolean isInvisible = false;
-
-    private Map<Integer, QuestPlayer> questList = new HashMap<>();
-    private boolean changeName;
-    public boolean afterFight = false;
-
-    public int lastfightmap = 0;
-    public GameCase lastfightcell = null;
-
-    public int isParcho = 0;
-    private boolean maitre;
-    public boolean ipdrop = false;
-    public boolean oneWindows = false;
-    public int difficulty = 0;
-    public boolean noitems = false;
-    public boolean noblackitems = false;
-    public boolean passturn = false;
-    //public boolean boutique =  false;
-    public boolean isInvocControlable = false;
-    private ArrayList<Player> compagnon = new ArrayList<>();
-    private Fighter currentCompagnon = null;
-    public int[] LastTonicProposed = new int[3];
-    //Systeme de Maitre
-    //Commande .maitre
-    public List<Player> PlayerList1 = new ArrayList<Player>();
-
-    public String lastTonicPacket="";
-
 
     public int getId() {
         return this.id;
     }
+
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account c) {
+        account = c;
+    }
+
+    public void banAccount(){
+        int days = 0;
+        if (this == null) {
+            if (Logging.USE_LOG) {
+                Logging.getInstance().write("BanFail", "Le joueur n'a pas été trouvé pour ban UseFaille");
+            }
+            return;
+        }
+
+        if (this.getAccount() == null)
+            Database.getStatics().getAccountData().load(this.getAccID());
+
+        if (this.getAccount() == null) {
+            if (Logging.USE_LOG) {
+                Logging.getInstance().write("BanFail", "Le compte du joueur n'a pas été trouvé pour ban UseFaille");
+            }
+            return;
+        }
+
+        this.getAccount().setBanned(true);
+        Database.getStatics().getAccountData().updateBannedTime(this.getAccount(), (System.currentTimeMillis() + 86400000) * days);
+
+        if (this.getGameClient() != null)
+            this.getGameClient().kick();
+
+    }
+
+    public int getAccID() {
+        return _accID;
+    }
+
+    // endregion [Category: Identity]
+
 
 
     // region [Category: Constructors]
@@ -737,10 +587,18 @@ public class Player {
 
     //region [Category: Master/Slave]
 
+    private boolean maitre;
+    public boolean ipdrop = false;
+    public boolean oneWindows = false;
+    public boolean passturn = false;
     public Player SlaveLeader = null;
-
-    //Retourne la liste des esclaves
+    //Commande .maitre
+    public List<Player> PlayerList1 = new ArrayList<Player>();
+    // Suiveur - Suivi
+    public Map<Integer, Player> follower = new HashMap<>();
+    public Player follow = null;
     @SuppressWarnings("rawtypes")
+    //Retourne la liste des esclaves
     public List<Player> getSlaves(){
         return PlayerList1;
     }
@@ -773,6 +631,16 @@ public class Player {
 
 
     //region [Category: Appearance]
+
+    private int color1;
+    private int color2;
+    private int color3;
+    private int sexe;
+    private int _size;
+    private int gfxId;
+    private int _orientation = 1;
+    private boolean isInvisible = false;
+
     public int get_orientation() {
         return _orientation;
     }
@@ -882,6 +750,24 @@ public class Player {
 
 
     //region [Category: Location/Speed]
+
+    public ArrayList<Integer> thisCases = new ArrayList<>();
+    private short oldMap = 0;
+    private int oldCell = 0;
+    private long timeTaverne = 0;
+    private boolean isBlocked = false;
+    private ArrayList<Short> _zaaps = new ArrayList<Short>();
+    private String _savePos;
+    private GameMap curMap;
+    private GameCase curCell;
+    public boolean donjon;
+    private int _Speed = 0;
+    public int thatMap = -1;
+    public int thatCell = -1;
+    public boolean walkFast = false;
+    public boolean getCases = false;
+    public boolean mpToTp = false;
+    private boolean isInPrivateArea = false;
 
     public int getSpeed() {
         return _Speed;
@@ -1657,6 +1543,9 @@ public class Player {
 
     //region [Category: Classe]
 
+    private int classeID;
+    private Classe classe;
+
     public int getClasseID() {
         return this.classeID;
     }
@@ -1778,6 +1667,31 @@ public class Player {
 
 
     //region [Category: Stats]
+
+    public Stats stats;
+    public byte needRestat = 0;
+    private Stats statsParcho = new Stats(true);
+    private int _capital;
+    private int level;
+    private int energy;
+    private long exp;
+    private int curPdv;
+    private int maxPdv;
+    private int regenRate = 500;
+    private long regenTime = -1; //-1 veut dire que la personne ne c'est jamais connecte
+    private int pa = 0,
+            pm = 0,
+            vitalite = 0,
+            sagesse = 0,
+            terre = 0,
+            feu = 0,
+            eau = 0,
+            air = 0, initiative = 0;
+    private boolean useStats = false;
+    public int isParcho = 0;
+    private boolean isGhost = false;
+    private int savestat;
+    public boolean isXpOffilike = false;
 
     public Stats getStats() {
         if (useStats)
@@ -2554,6 +2468,8 @@ public class Player {
 
     // region [Category: Quest]
 
+    private Map<Integer, QuestPlayer> questList = new HashMap<>();
+
     public void addQuestPerso(QuestPlayer qPerso) {
         questList.put(qPerso.getId(), qPerso);
     }
@@ -2599,6 +2515,32 @@ public class Player {
 
 
     //region [Category: Fight]
+
+    private Fight fight;
+    public boolean controleinvo = false;
+    public boolean noxp = false;
+    private boolean ready = false;
+    private boolean useCac = true;
+    private boolean _spec;
+    private int hasEndFight = -1;
+    private Action endFightAction;
+    private Monster.MobGroup hasMobGroup = null;
+    public boolean afterFight = false;
+    public int lastfightmap = 0;
+    public GameCase lastfightcell = null;
+    public int[] LastTonicProposed = new int[3];
+    private int duelId = -1;
+    private Map<Integer, Effect> buffs = new HashMap<Integer, Effect>();
+    public boolean isInvocControlable = false;
+    private ArrayList<Player> compagnon = new ArrayList<>();
+    private Fighter currentCompagnon = null;
+    public int difficulty = 0;
+    /** special fight **/
+    public TeamMatch kolizeum;
+    public DeathMatch deathMatch;
+    // Double
+    public boolean _isClone = false;
+
 
     public boolean isReady() {
         return ready;
@@ -2992,6 +2934,8 @@ public class Player {
         return packet;
     }
 
+    public String lastTonicPacket = "";
+
     // Compagnon
 
     public void setCurrentCompagnon(Fighter fighter)
@@ -3033,6 +2977,13 @@ public class Player {
 
 
     //region [Category: Spells]
+
+    private int _spellPts;
+    private Map<Integer, SpellGrade> _sorts = new HashMap<Integer, SpellGrade>();
+    private Map<Integer, Character> _sortsPlaces = new HashMap<Integer, Character>();
+    private Map<Integer, SpellGrade> _saveSorts = new HashMap<Integer, SpellGrade>();
+    private Map<Integer, Character> _saveSortsPlaces = new HashMap<Integer, Character>();
+    private int _saveSpellPts;
 
     public String parseSpellToDB() {
         StringBuilder sorts = new StringBuilder();
@@ -3434,6 +3385,18 @@ public class Player {
 
 
     //region [Category: Inventory/Bank/Mount]
+
+    private long kamas;
+    private Map<Integer, HashMap<Integer, Integer>> objectsClassSpell = new HashMap<>();
+    private boolean useInventory = true;
+    public boolean noitems = false;
+    public boolean noblackitems = false;
+    private Map<Long, Integer> _storeItems = new HashMap<>();                    //<ObjID, Prix>
+    private Map<Long, GameObject> objects = new HashMap<>();
+    // Monture
+    private Mount _mount;
+    private int _mountXpGive = 0;
+    private boolean _onMount = false;
 
     // Inventory
 
@@ -4561,6 +4524,16 @@ public class Player {
 
     // region [Category: Job/Commerce]
 
+    private JobAction _curJobAction;
+    private boolean _seeSeller = false;
+    private boolean _metierPublic = false;
+    private boolean _livreArti = false;
+    // Invitation
+    private int _inviting = 0;
+    private ArrayList<Integer> craftingType = new ArrayList<>();
+    private Map<Integer, JobStat> _metiers = new HashMap<Integer, JobStat>();
+
+
     // Job
 
     public void setCurJobAction(final JobAction JA) {
@@ -5252,7 +5225,40 @@ public class Player {
 
     //region [Category: Social]
 
+    private String name;
+    private byte _title = 0;
+    private String _allTitle = null;
+    private boolean changeName;
+    private int _emoteActive = 0;
+    private Party party;
+    private GuildMember _guildMember;
+    private boolean _showFriendConnection;
+    private String _canaux;
+    private boolean away;
+    public boolean noall = false;
+    private List<Integer> emotes = new ArrayList<>();
+    // Disponibilité
+    public boolean _isAbsent = false;
+    public boolean _isInvisible = false;
+    // Mariage
+    private int wife = 0;
+    private int _isOK = 0;
+    // Alignement
+    private byte _align = 0;
+    private int _deshonor = 0;
+    private int _honor = 0;
+    private boolean _showWings = false;
+    private Stalk _traqued;
+    private int _aLvl = 0;
+    private boolean canAggro = true;
+    public final Restriction restriction;
+    // Prison Alignement
+    public boolean isInEnnemyFaction;
+    public long enteredOnEnnemyFaction;
+
     // Name
+
+    private Group groupe;
 
     public void changePlayerName(String packet) {
         if (!packet.isEmpty()) {
@@ -5517,7 +5523,7 @@ public class Player {
         return !_isAbsent && (!_isInvisible || account.isFriendWith(sender.getAccount().getId()));
     }
 
-    // Groupe
+    // Groupe/Party
 
     public Group getGroupe() {
         return this.groupe;
@@ -6149,6 +6155,10 @@ public class Player {
 
     //region [Catergory: Morph]
 
+    //FullMorph Stats
+    private boolean _morphMode = false;
+    private int _morphId;
+
     public void demorph() {
         if (this.getMorphMode()) {
             int morphID = this.getClasseID() * 10 + this.getSexe();
@@ -6645,7 +6655,11 @@ public class Player {
 
 
 
-    // region [Category: Action]
+    // region [Category: Actions]
+
+    private GameAction _gameAction = null;
+    private boolean doAction;
+    private int action = -1;
 
     public int getIsOnDialogAction() {
         return this.action;
@@ -6757,6 +6771,8 @@ public class Player {
 
 
     // region [Category: Network]
+
+    private boolean isOnline = false;
 
     public GameClient getGameClient() {
         if(this.getAccount() != null){
@@ -6998,6 +7014,7 @@ public class Player {
     public String parseToOa() {
         return "Oa"  + this.getId() + "|"+ getGMStuffString() ;
     }
+
     public String parseToGM() {
         StringBuilder str = new StringBuilder();
         if (fight == null && curCell != null)// Hors combat
@@ -7459,6 +7476,11 @@ public class Player {
 
     // region [Category: Other]
 
+    public Start start;
+    public boolean isNew = false;
+    private House _curHouse;
+    private boolean sitted;
+
     public boolean isSubscribe() {
         return !Config.INSTANCE.getSubscription() || this.getAccount().isSubscribe();
     }
@@ -7676,44 +7698,7 @@ public class Player {
     }
 
 
-    public Account getAccount() {
-        return account;
-    }
 
-    public void setAccount(Account c) {
-        account = c;
-    }
-
-    public void banAccount(){
-        int days = 0;
-        if (this == null) {
-            if (Logging.USE_LOG) {
-                Logging.getInstance().write("BanFail", "Le joueur n'a pas été trouvé pour ban UseFaille");
-            }
-            return;
-        }
-
-        if (this.getAccount() == null)
-            Database.getStatics().getAccountData().load(this.getAccID());
-
-        if (this.getAccount() == null) {
-            if (Logging.USE_LOG) {
-                Logging.getInstance().write("BanFail", "Le compte du joueur n'a pas été trouvé pour ban UseFaille");
-            }
-            return;
-        }
-
-        this.getAccount().setBanned(true);
-        Database.getStatics().getAccountData().updateBannedTime(this.getAccount(), (System.currentTimeMillis() + 86400000) * days);
-
-        if (this.getGameClient() != null)
-            this.getGameClient().kick();
-
-    }
-
-    public int getAccID() {
-        return _accID;
-    }
 
     // endregion
 
