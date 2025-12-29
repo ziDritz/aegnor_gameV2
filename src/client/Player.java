@@ -119,7 +119,7 @@ public class Player {
 
     // region [Category: Constructors]
     public Player(int id, String name, int groupe, int sexe, int classeID,
-                  int color1, int color2, int color3, long startKamas, int pts,
+                  int color1, int color2, int color3, long kamas, int pts,
                   int _capital, int energy, int level, long exp, int _size,
                   int _gfxid, byte alignement, int account,
                   Map<Integer, Integer> stats, byte seeFriend,
@@ -139,7 +139,7 @@ public class Player {
         this.color1 = color1;
         this.color2 = color2;
         this.color3 = color3;
-        this.wallet = new PlayerWallet(this, startKamas);
+        this.kamas = kamas;
         this._capital = _capital;
         this._align = alignement;
         this._honor = honor;
@@ -3718,7 +3718,7 @@ public class Player {
             objects.get(guid).setQuantity(newQua);
             SocketManager.GAME_SEND_OBJECT_QUANTITY_PACKET(this, objects.get(guid));
         }
-        setKamas(getKamas() + prix);
+        kamas = kamas + prix;
 
         SocketManager.GAME_SEND_STATS_PACKET(this);
         SocketManager.GAME_SEND_Ow_PACKET(this);
