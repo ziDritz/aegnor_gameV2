@@ -3158,6 +3158,8 @@ public class Fight {
                 SocketManager.GAME_SEND_Im_PACKET(player, "1175");
             return false;
         }
+
+        // Check PA
         int usedPA;
 
         if (caster.getType() == 1 && player.getObjectsClassSpell().containsKey(spell.getSpellID())) {
@@ -3180,6 +3182,7 @@ public class Fight {
             return false;
         }
 
+        // Check state needed
         if(spell.getStateRequire() != -1) {
             if (!caster.haveState(spell.getStateRequire())) {
                 if (player != null)
@@ -3188,6 +3191,7 @@ public class Fight {
             }
         }
 
+        // Check state forbidden
         for(int stateId : spell.getStatesForbidden() ){
             if (caster.haveState(stateId)) {
                 if (player != null)
@@ -3196,12 +3200,14 @@ public class Fight {
             }
         }
 
+        // Check cell null
         if (cell == null) {
             if (player != null)
                 SocketManager.GAME_SEND_Im_PACKET(player, "1172");
             return false;
         }
 
+        // Check launch in line
         if (caster.getType() == 1 && player.getObjectsClassSpell().containsKey(spell.getSpellID())) {
             int modi = player.getValueOfClassObject(spell.getSpellID(), EffectConstant.STATS_SPELL_LINE_LAUNCH);
             boolean modif = modi >= 1;
@@ -3218,6 +3224,7 @@ public class Fight {
             return false;
         }
 
+        // Check line of sight
         char dir = PathFinding.getDirBetweenTwoCase(casterCell, cell.getId(), getMap(), true);
         if (spell.getSpellID() == 67) {
             if (PathFinding.checkLoS(getMap(), PathFinding.GetCaseIDFromDirrection(casterCell, dir, getMap(), true), cell.getId(), null, true)) {
@@ -3265,11 +3272,12 @@ public class Fight {
             return false;
         }
 
+        // Check PO
         int dist = PathFinding.getDistanceBetween(getMap(), casterCell, cell.getId());
         int maxAlc = spell.getMaxPO();
         int minAlc = spell.getMinPO();
 
-        // + porté
+            // + porté
         if (caster.getType() == 1 && player != null) {
             if(player.getObjectsClassSpell().containsKey(spell.getSpellID())) {
                 int modi = player.getValueOfClassObject(spell.getSpellID(), EffectConstant.STATS_SPELL_ADD_PO);
@@ -3277,7 +3285,7 @@ public class Fight {
             }
         }
 
-        // porté modifiable
+            // porté modifiable
         if (caster.getType() == 1 && player != null) {
             if(player.getObjectsClassSpell().containsKey(spell.getSpellID())) {
                 int modi = player.getValueOfClassObject(spell.getSpellID(), EffectConstant.STATS_SPELL_PO_MODIF);
@@ -3310,9 +3318,12 @@ public class Fight {
             return false;
         }
 
+        // Check cooldown
         if (!LaunchedSpell.cooldownGood(caster, spell.getSpellID())) {
             return false;
         }
+
+        // Check Max Launch by Turn
         int numLunch = spell.getMaxLaunchbyTurn();
 
         if (caster.getType() == 1 && player != null)
@@ -3330,6 +3341,8 @@ public class Fight {
             return false;
         }
         Fighter t = cell.getFirstFighter();
+
+        // Check Max Launch by target
         int numLunchT = spell.getMaxLaunchByTarget();
 
         if (caster.getType() == 1 && player != null)
